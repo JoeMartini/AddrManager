@@ -8,7 +8,7 @@
 
 import UIKit
 
-class FirstViewController: UIViewController {
+class ContactlistTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,6 +18,14 @@ class FirstViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    @IBAction func addDone(segue:UIStoryboardSegue) {
+        
+    }
+    
+    @IBAction func addCancle(segue:UIStoryboardSegue) {
+        
     }
 
 

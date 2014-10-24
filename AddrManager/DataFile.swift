@@ -8,20 +8,50 @@
 
 import UIKit
 
-var ADChinaJsonNSData:NSData = NSData.dataWithContentsOfURL(NSURL(string: "http://martini.wang/dev_resources/ADChina.json"), options: NSDataReadingOptions.DataReadingUncached, error: nil)
-
-//用SwiftJSON解析数据
-var ADChinaSwiftJSON = JSON(data: ADChinaJsonNSData, options: NSJSONReadingOptions.AllowFragments, error: nil)
-
-// 用于在界面中有多个文本框，需要根据键盘调节界面高度时，标记当前文本框
-var currentTextField:UITextField = UITextField()
-
 // 地址
 var address:String = ""
+// 地址更新
+func updateAddress (ADIndexs:[Int], detail:String) {
+    address = ""
+    var ADs:[String] = [ADInquiry(ADIndexs[0], nil, nil), ADInquiry(ADIndexs[0], ADIndexs[1], nil), ADInquiry(ADIndexs[0], ADIndexs[1], ADIndexs[2])]
+    for AD in ADs {
+        if !address.hasPrefix(AD) {     // && !address.hasSuffix(AD) {
+            address += AD
+        }
+    }
+    address += detail
+}
+
 // 邮编
 var zipcode:Int = 123456
 var postcode:Int = zipcode
 
+// Profile
+var myProfile:Dictionary = ["ID": "", "Name": "","Address": "", "Zipcode": ""]
+
+/*
+行政区json数据解析部分
+*/
+var ADChinaJsonNSData:NSData = NSData.dataWithContentsOfURL(NSURL(string: "http://martini.wang/dev_resources/ADChina.json"), options: NSDataReadingOptions.DataReadingUncached, error: nil)
+//用SwiftJSON解析数据
+var ADChinaSwiftJSON = JSON(data: ADChinaJsonNSData, options: NSJSONReadingOptions.AllowFragments, error: nil)
+// 行政区查询函数
+func ADInquiry (provinceIndex:Int, cityIndex:Int?, districtIndex:Int?) -> String {
+    var AD:String = ""
+    if cityIndex == nil {   // if city index is nil, district index should be nil, this inquiry has only province index
+        return ADChinaSwiftJSON["result"][provinceIndex]["province"].stringValue
+    } else if districtIndex == nil {   // if city index isn't nil while districtindex is nil, this inquiry has province index and city index
+        return ADChinaSwiftJSON["result"][provinceIndex]["city"][cityIndex!]["city"].stringValue
+    } else {    // if city index and district index are all not nil, this inquiry deserve districe
+        return ADChinaSwiftJSON["result"][provinceIndex]["city"][cityIndex!]["district"][districtIndex!]["district"].stringValue
+    }
+}
+
+/*
+界面自适应部分
+*/
+// 用于在界面中有多个文本框，需要根据键盘调节界面高度时，标记当前文本框
+var currentTextField:UITextField = UITextField()
 // 暂时只跟随UITextField调节View
 func viewAdjustToKeyboard (keyboardRect: CGRect, textField: UITextField) {
     var dy = keyboardRect.minY - (textField.frame.maxY + textField.superview!.frame.minY) - 8

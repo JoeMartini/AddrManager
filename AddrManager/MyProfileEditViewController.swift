@@ -22,7 +22,7 @@ class MyProfileEditViewController: UIViewController, UIPickerViewDelegate, UIPic
         
         // 借由NSNotification获取键盘事件信息
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
-        // NSNotificationCenter.defaultCenter().addObserver(self, selector: "tapOnBackgroundView:", name: UIKeyboardWillHideNotification, object: nil)
+        // NSNotificationCenter.defaultCenter().addObserver(self, selector: "tapOnBackgroundView:", name: UIKeyboardWillHideNotification, object: nil)    //因为设置了背景点击事件，暂时无需检测键盘收起事件
         
         // 选择框的委托设置
         addrPicker.dataSource = self
@@ -34,9 +34,44 @@ class MyProfileEditViewController: UIViewController, UIPickerViewDelegate, UIPic
         // Dispose of any resources that can be recreated.
     }
     
+    
+    @IBAction func typeInAddress(sender: AnyObject) {
+        addrPicker.hidden = !addrPicker.hidden
+        typeinView.hidden = !typeinView.hidden
+    }
+    
+    @IBAction func nameEditEnd(sender: AnyObject) {
+        println("\(nameTextField.text)")
+        //addrdetailTextFieldTapped(self)
+    }
+    @IBAction func addrdetailEditEnd(sender: AnyObject) {
+        println("\(addrdetailTextField.text)")
+    }
+    
+    @IBAction func TEST(sender: AnyObject) {
+        updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
+        println("\(nameTextField.text)在\(address)")
+    }
+    
     /*
     键盘弹出、收回时界面自适应
+    只适用于设置了touchdown事件，并标记为currentTextField的输入框
     */
+    // 点击下方TextField时，标记当前TextField
+    @IBAction func addrdetailTextFieldTapped(sender: AnyObject) {
+        currentTextField = addrdetailTextField
+    }
+    // 响应键盘弹出事件，获取键盘参数
+    func keyboardWillShow (notification:NSNotification) {
+        var keyboardRect: CGRect = (notification.userInfo![UIKeyboardFrameEndUserInfoKey] as NSValue).CGRectValue()
+        // 若键盘盖住输入框，则调整界面（需标记当前输入框，即手动设置其参与调解）
+        if currentTextField.frame.maxY > keyboardRect.minY {
+            // viewAdjustToKeyboard(keyboardRect, textField: currentTextField)
+            var dy = keyboardRect.minY - (currentTextField.frame.maxY + currentTextField.superview!.frame.minY) - 8
+            UIView.animateWithDuration(0.3, animations: {currentTextField.superview!.frame.offset(dx: 0, dy: dy)})
+        }
+        currentTextField = UITextField()
+    }
     // 点击背景处令输入框失去焦点，即可隐藏键盘
     @IBAction func tapOnBackgroundView(sender: UITapGestureRecognizer) {
         // 暂时按照两层view处理
@@ -53,34 +88,11 @@ class MyProfileEditViewController: UIViewController, UIPickerViewDelegate, UIPic
         }
         UIView.animateWithDuration(0.3, animations: {self.backgroundUIView.frame.offset(dx: 0, dy: 0 - self.backgroundUIView.frame.minY)})
     }
-    // 点击下方TextField时，标记当前TextField
-    @IBAction func addrdetailTextFieldTapped (sender: AnyObject) {
-        currentTextField = addrdetailTextField
-    }
-    // 响应键盘弹出事件，获取键盘参数
-    func keyboardWillShow (notification:NSNotification) {
-        var keyboardRect: CGRect = (notification.userInfo![UIKeyboardFrameEndUserInfoKey] as NSValue).CGRectValue()
-        // 若键盘盖住输入框，则调整界面（需标记当前输入框，即手动设置其参与调解）
-        if currentTextField.frame.maxY > keyboardRect.minY {
-            // viewAdjustToKeyboard(keyboardRect, textField: currentTextField)
-            var dy = keyboardRect.minY - (currentTextField.frame.maxY + currentTextField.superview!.frame.minY) - 8
-            UIView.animateWithDuration(0.3, animations: {currentTextField.superview!.frame.offset(dx: 0, dy: dy)})
-        }
-        currentTextField = UITextField()
-    }
-    
-    @IBAction func typeInAddress(sender: AnyObject) {
-        addrPicker.hidden = !addrPicker.hidden
-        typeinView.hidden = !typeinView.hidden
-    }
-    
-    @IBAction func nameEditEnd(sender: AnyObject) {
-        //addrdetailTextFieldTapped(self)
-    }
-    
     
     /*
     pickView 相关
+    已实现：省、市、区三级联动
+    待时限：调整字号；自动调整列宽（部分自治区等名称过长）或自动截取（前两个字）显示
     */
     // returns the number of 'columns' to display.
     func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
@@ -103,11 +115,11 @@ class MyProfileEditViewController: UIViewController, UIPickerViewDelegate, UIPic
     func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String! {
         switch component {
         case 0 :
-            return ADChinaSwiftJSON["result"][row]["province"].stringValue
+            return ADInquiry(row, nil, nil)
         case 1 :
-            return ADChinaSwiftJSON["result"][addrPicker.selectedRowInComponent(0)]["city"][row]["city"].stringValue
+            return ADInquiry(addrPicker.selectedRowInComponent(0), row, nil)
         case 2 :
-            return ADChinaSwiftJSON["result"][addrPicker.selectedRowInComponent(0)]["city"][addrPicker.selectedRowInComponent(1)]["district"][row]["district"].stringValue
+            return ADInquiry(addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1), row)
         default :
             return "Error"
         }
@@ -116,8 +128,6 @@ class MyProfileEditViewController: UIViewController, UIPickerViewDelegate, UIPic
     func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         // 另name输入框失去焦点
         nameTextField.resignFirstResponder()
-        
-        println("set row \(row) in componet \(component)")
         // 根据操作列刷新其他列显示
         switch component {
         case 0 :
@@ -133,10 +143,7 @@ class MyProfileEditViewController: UIViewController, UIPickerViewDelegate, UIPic
         default :
             break
         }
-        
-        // testcode for ADs in address
-        var str:String = ADChinaSwiftJSON["result"][addrPicker.selectedRowInComponent(0)]["province"].stringValue + ADChinaSwiftJSON["result"][addrPicker.selectedRowInComponent(0)]["city"][addrPicker.selectedRowInComponent(1)]["city"].stringValue + ADChinaSwiftJSON["result"][addrPicker.selectedRowInComponent(0)]["city"][addrPicker.selectedRowInComponent(1)]["district"][addrPicker.selectedRowInComponent(2)]["district"].stringValue
-        println( str )
+        updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
+        println(address)
     }
-    
 }

@@ -27,7 +27,7 @@ var zipcode:Int = 123456
 var postcode:Int = zipcode
 
 // Profile
-var myProfile:Dictionary = ["ID": "", "Name": "","Address": "", "Zipcode": ""]
+var myProfile:[String: String] = ["ID": "", "Name": "测试员","Address": "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区", "Zipcode": "222222"]
 
 /*
 行政区json数据解析部分

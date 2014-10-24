@@ -34,6 +34,15 @@ class MyProfileEditViewController: UIViewController, UIPickerViewDelegate, UIPic
         // Dispose of any resources that can be recreated.
     }
     
+    // Done 按钮触发Unwind事件，返回Profile页面
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "myProfileEditDone" {
+            updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
+            myProfile["Name"] = nameTextField.text
+            myProfile["Address"] = address
+            myProfile["Zipcode"] = "\(zipcode)"
+        }
+    }
     
     @IBAction func typeInAddress(sender: AnyObject) {
         addrPicker.hidden = !addrPicker.hidden
@@ -46,12 +55,15 @@ class MyProfileEditViewController: UIViewController, UIPickerViewDelegate, UIPic
     }
     @IBAction func addrdetailEditEnd(sender: AnyObject) {
         println("\(addrdetailTextField.text)")
+        updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
     }
     
     @IBAction func TEST(sender: AnyObject) {
         updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
         println("\(nameTextField.text)在\(address)")
     }
+    
+    
     
     /*
     键盘弹出、收回时界面自适应

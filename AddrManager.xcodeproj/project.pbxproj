@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5922E3DF19F2655700EA873F /* DataFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5922E3DE19F2655700EA873F /* DataFile.swift */; };
 		5922E41619F2C1B900EA873F /* MyProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5922E41519F2C1B900EA873F /* MyProfileEditViewController.swift */; };
+		5944869D19FA32E8005561A2 /* DataFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5922E3DE19F2655700EA873F /* DataFile.swift */; };
 		5953354F19EFAF6B005BD9DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953354E19EFAF6B005BD9DB /* AppDelegate.swift */; };
 		5953355119EFAF6B005BD9DB /* contactlistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953355019EFAF6B005BD9DB /* contactlistViewController.swift */; };
 		5953355319EFAF6B005BD9DB /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953355219EFAF6B005BD9DB /* SecondViewController.swift */; };
@@ -229,11 +229,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5944869D19FA32E8005561A2 /* DataFile.swift in Sources */,
 				5922E41619F2C1B900EA873F /* MyProfileEditViewController.swift in Sources */,
 				5953355319EFAF6B005BD9DB /* SecondViewController.swift in Sources */,
 				5953354F19EFAF6B005BD9DB /* AppDelegate.swift in Sources */,
 				5953357119EFC1D0005BD9DB /* MyProfileViewController.swift in Sources */,
-				5922E3DF19F2655700EA873F /* DataFile.swift in Sources */,
 				59577E4B19F6487B00F0CB36 /* SwiftyJSON.swift in Sources */,
 				5953355119EFAF6B005BD9DB /* contactlistViewController.swift in Sources */,
 			);

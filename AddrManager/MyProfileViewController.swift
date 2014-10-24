@@ -18,6 +18,9 @@ class MyProfileViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        myName.text = myProfile["Name"]!
+        myZipcode.text = myProfile["Zipcode"]!
+        myAddress.text = myProfile["Address"]!
     }
     
     override func didReceiveMemoryWarning() {
@@ -25,17 +28,8 @@ class MyProfileViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    @IBAction func ProfileEditButton(sender: AnyObject) {
-    }
-    
-    @IBAction func ProfileShareButton(sender: AnyObject) {
-        
-    }
-    
-    @IBAction func SettingButton(sender: AnyObject) {
-    }
-    
+    // Unwind from MyProfileEditViewController
     @IBAction func editDone(segue:UIStoryboardSegue) {
-        
+        self.viewDidLoad()
     }
 }

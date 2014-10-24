@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="49e-Tb-3d3">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <scenes>
@@ -40,9 +41,6 @@
                                 <state key="normal" title="Setting">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
-                                <connections>
-                                    <action selector="SettingButton:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="szq-2i-JSG"/>
-                                </connections>
                             </button>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="266200" id="Us3-0B-Aht">
                                 <rect key="frame" x="16" y="157" width="288" height="37"/>
@@ -65,9 +63,6 @@
                                 <state key="normal" title="Share">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
-                                <connections>
-                                    <action selector="ProfileShareButton:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="yHg-dy-kfJ"/>
-                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -76,7 +71,7 @@
                     <navigationItem key="navigationItem" title="My Profile" id="YM0-Hf-WE7">
                         <barButtonItem key="rightBarButtonItem" title="Edit" id="1rt-IR-fuH">
                             <connections>
-                                <segue destination="vve-9e-qBy" kind="push" id="DL3-f3-mGF"/>
+                                <segue destination="vve-9e-qBy" kind="push" identifier="" id="DL3-f3-mGF"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -180,10 +175,6 @@
                                     <action selector="SettingButton:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="Kxz-J0-Yy7"/>
                                 </connections>
                             </button>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" id="dwn-b2-wKI">
-                                <rect key="frame" x="232" y="482" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </activityIndicatorView>
                             <view hidden="YES" contentMode="scaleToFill" id="r3U-SA-NpL">
                                 <rect key="frame" x="16" y="196" width="288" height="68"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -250,7 +241,7 @@
                     <navigationItem key="navigationItem" title="Profile Edit" id="9XD-Is-21B">
                         <barButtonItem key="rightBarButtonItem" title="Done" id="jr2-bo-JdO">
                             <connections>
-                                <segue destination="7f0-oc-OdT" kind="unwind" unwindAction="editDone:" id="1o7-6m-vkP"/>
+                                <segue destination="7f0-oc-OdT" kind="unwind" identifier="myProfileEditDone" unwindAction="editDone:" id="1o7-6m-vkP"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

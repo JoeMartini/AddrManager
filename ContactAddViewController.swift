@@ -1,14 +1,14 @@
 //
-//  MyProfileEditViewController.swift
+//  ContactAddViewController.swift
 //  AddrManager
 //
-//  Created by Martini Wang on 14/10/18.
+//  Created by Martini Wang on 14/10/25.
 //  Copyright (c) 2014年 Martini Wang. All rights reserved.
 //
 
 import UIKit
 
-class MyProfileEditViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
+class ContactAddViewController: UIViewController,UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
     
     @IBOutlet var backgroundUIView: UIView!
     @IBOutlet weak var nameTextField: UITextField!
@@ -50,11 +50,20 @@ class MyProfileEditViewController: UIViewController, UITextFieldDelegate, UIPick
     ProfileVC 重新加载页面
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "myProfileEditDone" {
+        switch segue.identifier {
+        case "contactAddDone" :
+            /*
+            信息规范性检测：姓名不为空；详细地址不为空
+            检测通过则继续，不通过需要处理机制（弹出对话框填写or返回原界面）
+            */
             updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
-            myProfile["Name"] = nameTextField.text
-            myProfile["Address"] = address
-            myProfile["Zipcode"] = "\(zipcode)"
+            anyProfile["Name"] = nameTextField.text
+            anyProfile["Address"] = address
+            anyProfile["Zipcode"] = "\(zipcode)"
+        case "contactAddCancel" :
+            break
+        default :
+            break
         }
     }
     
@@ -69,6 +78,7 @@ class MyProfileEditViewController: UIViewController, UITextFieldDelegate, UIPick
     }
     @IBAction func addrdetailEditEnd(sender: AnyObject) {
         println(address)
+        //updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
     }
     
     // 键盘return键响应函数

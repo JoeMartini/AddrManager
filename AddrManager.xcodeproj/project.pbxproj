@@ -15,12 +15,13 @@
 		5944869D19FA32E8005561A2 /* DataFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5922E3DE19F2655700EA873F /* DataFile.swift */; };
 		5953354F19EFAF6B005BD9DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953354E19EFAF6B005BD9DB /* AppDelegate.swift */; };
 		5953355119EFAF6B005BD9DB /* ContactlistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953355019EFAF6B005BD9DB /* ContactlistViewController.swift */; };
-		5953355319EFAF6B005BD9DB /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953355219EFAF6B005BD9DB /* SecondViewController.swift */; };
+		5953355319EFAF6B005BD9DB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953355219EFAF6B005BD9DB /* ViewController.swift */; };
 		5953355619EFAF6C005BD9DB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5953355419EFAF6C005BD9DB /* Main.storyboard */; };
 		5953355819EFAF6C005BD9DB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5953355719EFAF6C005BD9DB /* Images.xcassets */; };
 		5953355B19EFAF6C005BD9DB /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5953355919EFAF6C005BD9DB /* LaunchScreen.xib */; };
 		5953356719EFAF6C005BD9DB /* AddrManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953356619EFAF6C005BD9DB /* AddrManagerTests.swift */; };
 		5953357119EFC1D0005BD9DB /* MyProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953357019EFC1D0005BD9DB /* MyProfileViewController.swift */; };
+		59AFA4BB19FE78D30066AF5F /* ContactDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59AFA4BA19FE78D30066AF5F /* ContactDetailViewController.swift */; };
 		59F24C2C19FDFF760023407E /* ADPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59F24C2B19FDFF750023407E /* ADPickerViewController.swift */; };
 		59F24C2F19FE03400023407E /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59F24C2E19FE03400023407E /* SwiftyJSON.swift */; };
 /* End PBXBuildFile section */
@@ -46,7 +47,7 @@
 		5953354D19EFAF6B005BD9DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5953354E19EFAF6B005BD9DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5953355019EFAF6B005BD9DB /* ContactlistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactlistViewController.swift; sourceTree = "<group>"; };
-		5953355219EFAF6B005BD9DB /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
+		5953355219EFAF6B005BD9DB /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		5953355519EFAF6C005BD9DB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		5953355719EFAF6C005BD9DB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		5953355A19EFAF6C005BD9DB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -54,6 +55,7 @@
 		5953356519EFAF6C005BD9DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5953356619EFAF6C005BD9DB /* AddrManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddrManagerTests.swift; sourceTree = "<group>"; };
 		5953357019EFC1D0005BD9DB /* MyProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyProfileViewController.swift; sourceTree = "<group>"; };
+		59AFA4BA19FE78D30066AF5F /* ContactDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactDetailViewController.swift; sourceTree = "<group>"; };
 		59F24C2B19FDFF750023407E /* ADPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ADPickerViewController.swift; sourceTree = "<group>"; };
 		59F24C2D19FE03400023407E /* SwiftyJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwiftyJSON.h; sourceTree = "<group>"; };
 		59F24C2E19FE03400023407E /* SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyJSON.swift; sourceTree = "<group>"; };
@@ -101,17 +103,12 @@
 			isa = PBXGroup;
 			children = (
 				5953354E19EFAF6B005BD9DB /* AppDelegate.swift */,
-				5953355019EFAF6B005BD9DB /* ContactlistViewController.swift */,
-				5942F6AC19FB769A00B37036 /* ContactAddViewController.swift */,
-				5953357019EFC1D0005BD9DB /* MyProfileViewController.swift */,
-				5922E41519F2C1B900EA873F /* MyProfileEditViewController.swift */,
+				59AFA4B719FE559C0066AF5F /* ViewControllers */,
 				5953355419EFAF6C005BD9DB /* Main.storyboard */,
 				5953355719EFAF6C005BD9DB /* Images.xcassets */,
 				5953355919EFAF6C005BD9DB /* LaunchScreen.xib */,
 				5953354C19EFAF6B005BD9DB /* Supporting Files */,
 				5922E3DE19F2655700EA873F /* DataFile.swift */,
-				5942F6AA19FB73B100B37036 /* MapOfPostcardsViewController.swift */,
-				5953355219EFAF6B005BD9DB /* SecondViewController.swift */,
 			);
 			path = AddrManager;
 			sourceTree = "<group>";
@@ -143,6 +140,20 @@
 				5953356519EFAF6C005BD9DB /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		59AFA4B719FE559C0066AF5F /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				5953355019EFAF6B005BD9DB /* ContactlistViewController.swift */,
+				59AFA4BA19FE78D30066AF5F /* ContactDetailViewController.swift */,
+				5942F6AC19FB769A00B37036 /* ContactAddViewController.swift */,
+				5953357019EFC1D0005BD9DB /* MyProfileViewController.swift */,
+				5922E41519F2C1B900EA873F /* MyProfileEditViewController.swift */,
+				5942F6AA19FB73B100B37036 /* MapOfPostcardsViewController.swift */,
+				5953355219EFAF6B005BD9DB /* ViewController.swift */,
+			);
+			name = ViewControllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -256,10 +267,11 @@
 				59F24C2F19FE03400023407E /* SwiftyJSON.swift in Sources */,
 				5925F04219FE2C5400ED892A /* AutoadjustTextFieldViewController.swift in Sources */,
 				59F24C2C19FDFF760023407E /* ADPickerViewController.swift in Sources */,
-				5953355319EFAF6B005BD9DB /* SecondViewController.swift in Sources */,
+				5953355319EFAF6B005BD9DB /* ViewController.swift in Sources */,
 				5953354F19EFAF6B005BD9DB /* AppDelegate.swift in Sources */,
 				5953357119EFC1D0005BD9DB /* MyProfileViewController.swift in Sources */,
 				5942F6AD19FB769A00B37036 /* ContactAddViewController.swift in Sources */,
+				59AFA4BB19FE78D30066AF5F /* ContactDetailViewController.swift in Sources */,
 				5953355119EFAF6B005BD9DB /* ContactlistViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

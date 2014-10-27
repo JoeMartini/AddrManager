@@ -8,16 +8,21 @@
 
 /* Begin PBXBuildFile section */
 		5922E41619F2C1B900EA873F /* MyProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5922E41519F2C1B900EA873F /* MyProfileEditViewController.swift */; };
+		59244E1C19FB8DF5009988F5 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59244E1B19FB8DF5009988F5 /* MapKit.framework */; };
+		5925F04219FE2C5400ED892A /* AutoadjustTextFieldViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5925F04119FE2C5400ED892A /* AutoadjustTextFieldViewController.swift */; };
+		5942F6AB19FB73B100B37036 /* MapOfPostcardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942F6AA19FB73B100B37036 /* MapOfPostcardsViewController.swift */; };
+		5942F6AD19FB769A00B37036 /* ContactAddViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942F6AC19FB769A00B37036 /* ContactAddViewController.swift */; };
 		5944869D19FA32E8005561A2 /* DataFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5922E3DE19F2655700EA873F /* DataFile.swift */; };
 		5953354F19EFAF6B005BD9DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953354E19EFAF6B005BD9DB /* AppDelegate.swift */; };
-		5953355119EFAF6B005BD9DB /* contactlistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953355019EFAF6B005BD9DB /* contactlistViewController.swift */; };
+		5953355119EFAF6B005BD9DB /* ContactlistViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953355019EFAF6B005BD9DB /* ContactlistViewController.swift */; };
 		5953355319EFAF6B005BD9DB /* SecondViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953355219EFAF6B005BD9DB /* SecondViewController.swift */; };
 		5953355619EFAF6C005BD9DB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5953355419EFAF6C005BD9DB /* Main.storyboard */; };
 		5953355819EFAF6C005BD9DB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5953355719EFAF6C005BD9DB /* Images.xcassets */; };
 		5953355B19EFAF6C005BD9DB /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5953355919EFAF6C005BD9DB /* LaunchScreen.xib */; };
 		5953356719EFAF6C005BD9DB /* AddrManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953356619EFAF6C005BD9DB /* AddrManagerTests.swift */; };
 		5953357119EFC1D0005BD9DB /* MyProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5953357019EFC1D0005BD9DB /* MyProfileViewController.swift */; };
-		59577E4B19F6487B00F0CB36 /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59577E4A19F6487B00F0CB36 /* SwiftyJSON.swift */; };
+		59F24C2C19FDFF760023407E /* ADPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59F24C2B19FDFF750023407E /* ADPickerViewController.swift */; };
+		59F24C2F19FE03400023407E /* SwiftyJSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59F24C2E19FE03400023407E /* SwiftyJSON.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,10 +38,14 @@
 /* Begin PBXFileReference section */
 		5922E3DE19F2655700EA873F /* DataFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataFile.swift; sourceTree = "<group>"; };
 		5922E41519F2C1B900EA873F /* MyProfileEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyProfileEditViewController.swift; sourceTree = "<group>"; };
+		59244E1B19FB8DF5009988F5 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		5925F04119FE2C5400ED892A /* AutoadjustTextFieldViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoadjustTextFieldViewController.swift; sourceTree = "<group>"; };
+		5942F6AA19FB73B100B37036 /* MapOfPostcardsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapOfPostcardsViewController.swift; sourceTree = "<group>"; };
+		5942F6AC19FB769A00B37036 /* ContactAddViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactAddViewController.swift; sourceTree = "<group>"; };
 		5953354919EFAF6B005BD9DB /* AddrManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AddrManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5953354D19EFAF6B005BD9DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5953354E19EFAF6B005BD9DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		5953355019EFAF6B005BD9DB /* contactlistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = contactlistViewController.swift; sourceTree = "<group>"; };
+		5953355019EFAF6B005BD9DB /* ContactlistViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactlistViewController.swift; sourceTree = "<group>"; };
 		5953355219EFAF6B005BD9DB /* SecondViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecondViewController.swift; sourceTree = "<group>"; };
 		5953355519EFAF6C005BD9DB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		5953355719EFAF6C005BD9DB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -45,8 +54,9 @@
 		5953356519EFAF6C005BD9DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5953356619EFAF6C005BD9DB /* AddrManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddrManagerTests.swift; sourceTree = "<group>"; };
 		5953357019EFC1D0005BD9DB /* MyProfileViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyProfileViewController.swift; sourceTree = "<group>"; };
-		59577E4A19F6487B00F0CB36 /* SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyJSON.swift; sourceTree = "<group>"; };
-		59FB0C6C19F644E8003FACC1 /* SwiftyJSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwiftyJSON.h; sourceTree = "<group>"; };
+		59F24C2B19FDFF750023407E /* ADPickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ADPickerViewController.swift; sourceTree = "<group>"; };
+		59F24C2D19FE03400023407E /* SwiftyJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwiftyJSON.h; sourceTree = "<group>"; };
+		59F24C2E19FE03400023407E /* SwiftyJSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftyJSON.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +64,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				59244E1C19FB8DF5009988F5 /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,6 +81,7 @@
 		5953354019EFAF6B005BD9DB = {
 			isa = PBXGroup;
 			children = (
+				59244E1B19FB8DF5009988F5 /* MapKit.framework */,
 				5953354B19EFAF6B005BD9DB /* AddrManager */,
 				5953356319EFAF6C005BD9DB /* AddrManagerTests */,
 				5953354A19EFAF6B005BD9DB /* Products */,
@@ -89,8 +101,8 @@
 			isa = PBXGroup;
 			children = (
 				5953354E19EFAF6B005BD9DB /* AppDelegate.swift */,
-				5953355019EFAF6B005BD9DB /* contactlistViewController.swift */,
-				5953355219EFAF6B005BD9DB /* SecondViewController.swift */,
+				5953355019EFAF6B005BD9DB /* ContactlistViewController.swift */,
+				5942F6AC19FB769A00B37036 /* ContactAddViewController.swift */,
 				5953357019EFC1D0005BD9DB /* MyProfileViewController.swift */,
 				5922E41519F2C1B900EA873F /* MyProfileEditViewController.swift */,
 				5953355419EFAF6C005BD9DB /* Main.storyboard */,
@@ -98,6 +110,8 @@
 				5953355919EFAF6C005BD9DB /* LaunchScreen.xib */,
 				5953354C19EFAF6B005BD9DB /* Supporting Files */,
 				5922E3DE19F2655700EA873F /* DataFile.swift */,
+				5942F6AA19FB73B100B37036 /* MapOfPostcardsViewController.swift */,
+				5953355219EFAF6B005BD9DB /* SecondViewController.swift */,
 			);
 			path = AddrManager;
 			sourceTree = "<group>";
@@ -105,8 +119,10 @@
 		5953354C19EFAF6B005BD9DB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				59FB0C6C19F644E8003FACC1 /* SwiftyJSON.h */,
-				59577E4A19F6487B00F0CB36 /* SwiftyJSON.swift */,
+				59F24C2B19FDFF750023407E /* ADPickerViewController.swift */,
+				5925F04119FE2C5400ED892A /* AutoadjustTextFieldViewController.swift */,
+				59F24C2D19FE03400023407E /* SwiftyJSON.h */,
+				59F24C2E19FE03400023407E /* SwiftyJSON.swift */,
 				5953354D19EFAF6B005BD9DB /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -178,6 +194,11 @@
 				TargetAttributes = {
 					5953354819EFAF6B005BD9DB = {
 						CreatedOnToolsVersion = 6.0.1;
+						SystemCapabilities = {
+							com.apple.Maps.iOS = {
+								enabled = 1;
+							};
+						};
 					};
 					5953355F19EFAF6C005BD9DB = {
 						CreatedOnToolsVersion = 6.0.1;
@@ -231,11 +252,15 @@
 			files = (
 				5944869D19FA32E8005561A2 /* DataFile.swift in Sources */,
 				5922E41619F2C1B900EA873F /* MyProfileEditViewController.swift in Sources */,
+				5942F6AB19FB73B100B37036 /* MapOfPostcardsViewController.swift in Sources */,
+				59F24C2F19FE03400023407E /* SwiftyJSON.swift in Sources */,
+				5925F04219FE2C5400ED892A /* AutoadjustTextFieldViewController.swift in Sources */,
+				59F24C2C19FDFF760023407E /* ADPickerViewController.swift in Sources */,
 				5953355319EFAF6B005BD9DB /* SecondViewController.swift in Sources */,
 				5953354F19EFAF6B005BD9DB /* AppDelegate.swift in Sources */,
 				5953357119EFC1D0005BD9DB /* MyProfileViewController.swift in Sources */,
-				59577E4B19F6487B00F0CB36 /* SwiftyJSON.swift in Sources */,
-				5953355119EFAF6B005BD9DB /* contactlistViewController.swift in Sources */,
+				5942F6AD19FB769A00B37036 /* ContactAddViewController.swift in Sources */,
+				5953355119EFAF6B005BD9DB /* ContactlistViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -15,7 +15,7 @@ func updateAddress (ADIndexs:[Int], detail:String) {
     address = ""
     var ADs:[String] = [ADInquiry(ADIndexs[0], nil, nil), ADInquiry(ADIndexs[0], ADIndexs[1], nil), ADInquiry(ADIndexs[0], ADIndexs[1], ADIndexs[2])]
     for AD in ADs {
-        if !address.hasPrefix(AD) {     // && !address.hasSuffix(AD) {
+        if !address.hasPrefix(AD) {     // 避免直辖市重复两添加，如“上海市上海市”
             address += AD
         }
     }
@@ -25,14 +25,20 @@ func updateAddress (ADIndexs:[Int], detail:String) {
 // 邮编
 var zipcode:Int = 123456
 var postcode:Int = zipcode
+func updateZipcode (address:String) -> String {
+    return "000000"
+}
 
 // Profile
-var myProfile:[String: String] = ["ID": "", "Name": "测试员","Address": "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区", "Zipcode": "222222"]
+var myProfile:[String: String] = ["ID": "", "Name": "测试员","Address": "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区", "Zipcode": "222222"]     // var xxx:Dicitonary 写法会再调用时报错
+var anyProfile:[String: String] = ["ID": "", "Name": "","Address": "", "Zipcode": ""]
+var allProfiles:[Int: Dictionary] = [0: anyProfile]
 
 /*
 行政区json数据解析部分
 */
-var ADChinaJsonNSData:NSData = NSData.dataWithContentsOfURL(NSURL(string: "http://martini.wang/dev_resources/ADChina.json"), options: NSDataReadingOptions.DataReadingUncached, error: nil)
+// 获取数据
+var ADChinaJsonNSData:NSData = NSData(contentsOfURL: NSURL(string: "http://martini.wang/dev_resources/ADChina.json")!, options: NSDataReadingOptions.UncachedRead, error: nil)!//.dataWithContentsOfURL(NSURL(string: "http://martini.wang/dev_resources/ADChina.json")!, options: NSDataReadingOptions.DataReadingUncached, error: nil)
 //用SwiftJSON解析数据
 var ADChinaSwiftJSON = JSON(data: ADChinaJsonNSData, options: NSJSONReadingOptions.AllowFragments, error: nil)
 // 行政区查询函数
@@ -46,6 +52,7 @@ func ADInquiry (provinceIndex:Int, cityIndex:Int?, districtIndex:Int?) -> String
         return ADChinaSwiftJSON["result"][provinceIndex]["city"][cityIndex!]["district"][districtIndex!]["district"].stringValue
     }
 }
+//let ADChinaPickerVC:ADPickerViewController = ADPickerViewController()
 
 /*
 界面自适应部分

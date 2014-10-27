@@ -19,6 +19,13 @@ import UIKit
 
 class ADPickerViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDelegate {
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        // Do any additional setup after loading the view, typically from a nib.
+        
+        self.view.hidden = true
+    }
+    
     // returns the number of 'columns' to display.
     func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
         return 3
@@ -51,6 +58,7 @@ class ADPickerViewController: UIViewController, UIPickerViewDataSource, UIPicker
     }
     // pickerView 滚动操作响应函数
     func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        hideKeyboard()
         // 根据操作列刷新其他列显示
         switch component {
         case 0 :
@@ -66,7 +74,20 @@ class ADPickerViewController: UIViewController, UIPickerViewDataSource, UIPicker
         default :
             break
         }
-        updateAddress([pickerView.selectedRowInComponent(0), pickerView.selectedRowInComponent(1),pickerView.selectedRowInComponent(2)], "")
-        println(address)
+    }
+    
+    func hideKeyboard () {
+        let superview = super.view.superview!
+        for subView in superview.subviews {
+            if subView.isMemberOfClass(UITextField) {
+                subView.resignFirstResponder()
+            }else if (subView.subviews.count != 0) {
+                for subsubView in subView.subviews {
+                    if subsubView.isMemberOfClass(UITextField) {
+                        subsubView.resignFirstResponder()
+                    }
+                }
+            }
+        }
     }
 }

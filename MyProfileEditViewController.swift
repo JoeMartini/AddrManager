@@ -25,13 +25,13 @@ class MyProfileEditViewController: UIViewController {
         
         // 选择框的委托设置
         let ADChinaPickerVC:ADPickerViewController = ADPickerViewController()
+        self.view.addSubview(ADChinaPickerVC.view)
         self.addChildViewController(ADChinaPickerVC)
         addrPicker.dataSource = ADChinaPickerVC
         addrPicker.delegate = ADChinaPickerVC
         
         // 输入框委托设置
         let autoadjustTFVC:AutoadjustTextFieldVC = AutoadjustTextFieldVC()
-        autoadjustTFVC.view.hidden = true
         self.view.addSubview(autoadjustTFVC.view)
         self.addChildViewController(autoadjustTFVC)
         

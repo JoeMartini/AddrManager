@@ -8,11 +8,37 @@
 
 import UIKit
 
+// 测试代码
+func test (textField:UITextField, str1:String, str2:String?) {
+    if (str2 != nil) {
+        textField.text = str1 + "\(allProfiles.count * 10)" + str2!
+    }else{
+        textField.text = str1 + "\(allProfiles.count)"
+    }
+}
+
+// 邮编
+var zipcode:String = "123456"
+var postcode:Int = zipcode.toInt()!
+func updateZipcode (address:String) -> String {
+    return "000000"
+}
+
+// Profile
+var myProfile:[String: String] = ["ID": "0", "Name": "测试员", "Address": "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区", "Zipcode": "222222"]     // var xxx:Dicitonary 写法会再调用时报错
+var anyProfile:[String: String] = ["ID": "1", "Name": "测试员1", "Address": "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区", "Zipcode": "333333"]
+var allProfiles:[Int: [String: String]] = [0: myProfile, 1: anyProfile]
+// 新建个人信息
+func addNewProfile (Name:String, Address:String, Zipcode:String) {
+    allProfiles[allProfiles.count] = ["ID": "\(allProfiles.count)", "Name": Name, "Address": Address, "Zipcode": Zipcode]
+    println(allProfiles[allProfiles.count - 1])
+}
+
 // 地址
 var address:String = ""
-// 地址更新
-func updateAddress (ADIndexs:[Int], detail:String) {
-    address = ""
+// 地址更新，传入整数数组，作为行政区划查询索引值
+func updateAddress (ADIndexs:[Int], detail:String) -> String {
+    var address = ""
     var ADs:[String] = [ADInquiry(ADIndexs[0], nil, nil), ADInquiry(ADIndexs[0], ADIndexs[1], nil), ADInquiry(ADIndexs[0], ADIndexs[1], ADIndexs[2])]
     for AD in ADs {
         if !address.hasPrefix(AD) {     // 避免直辖市重复两添加，如“上海市上海市”
@@ -20,19 +46,8 @@ func updateAddress (ADIndexs:[Int], detail:String) {
         }
     }
     address += detail
+    return address
 }
-
-// 邮编
-var zipcode:Int = 123456
-var postcode:Int = zipcode
-func updateZipcode (address:String) -> String {
-    return "000000"
-}
-
-// Profile
-var myProfile:[String: String] = ["ID": "", "Name": "测试员","Address": "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区", "Zipcode": "222222"]     // var xxx:Dicitonary 写法会再调用时报错
-var anyProfile:[String: String] = ["ID": "", "Name": "","Address": "", "Zipcode": ""]
-var allProfiles:[Int: Dictionary] = [0: anyProfile]
 
 /*
 行政区json数据解析部分

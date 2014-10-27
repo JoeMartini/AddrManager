@@ -25,13 +25,13 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
         
         // 选择框的委托设置
         let ADChinaPickerVC:ADPickerViewController = ADPickerViewController()
+        self.view.addSubview(ADChinaPickerVC.view)
         self.addChildViewController(ADChinaPickerVC)
         addrPicker.dataSource = ADChinaPickerVC
         addrPicker.delegate = ADChinaPickerVC
         
         // 输入框委托设置
         let autoadjustTFVC:AutoadjustTextFieldVC = AutoadjustTextFieldVC()
-        autoadjustTFVC.view.hidden = true
         self.view.addSubview(autoadjustTFVC.view)
         self.addChildViewController(autoadjustTFVC)
         
@@ -40,6 +40,10 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
         provinceTextField.delegate = autoadjustTFVC
         cityTextField.delegate = autoadjustTFVC
         districtTextField.delegate = autoadjustTFVC
+        
+        // 加载一段测试——添加用户
+        test(nameTextField, "测试员", nil)
+        test(addrdetailTextField, "中山路", "号")
     }
     
     override func didReceiveMemoryWarning() {
@@ -58,10 +62,12 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
             信息规范性检测：姓名不为空；详细地址不为空
             检测通过则继续，不通过需要处理机制（弹出对话框填写or返回原界面）
             */
-            updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
-            anyProfile["Name"] = nameTextField.text
-            anyProfile["Address"] = address
-            anyProfile["Zipcode"] = "\(zipcode)"
+            // 刷新地址
+            address = updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
+            // 根据地址获取邮编（暂未实现）
+            zipcode = updateZipcode(address)
+            // 新建用户
+            addNewProfile(nameTextField.text, address, zipcode)
         case "contactAddCancel" :
             break
         default :
@@ -75,10 +81,10 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
     }
     
     @IBAction func nameEditEnd(sender: AnyObject) {
-        println("\(nameTextField.text)")
+        //println("\(nameTextField.text)")
     }
     @IBAction func addrdetailEditEnd(sender: AnyObject) {
-        println(address)
+        //println(address)
     }
     
     // 点击下方TextField时，标记当前TextField

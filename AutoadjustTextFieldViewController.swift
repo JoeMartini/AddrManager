@@ -21,6 +21,8 @@ class AutoadjustTextFieldVC: UIViewController, UITextFieldDelegate {
         // 借由NSNotification获取键盘事件信息
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
+        
+        self.view.hidden = true
     }
     
     // 键盘return键响应函数

@@ -38,7 +38,7 @@ var allProfiles:[Int: Dictionary] = [0: anyProfile]
 行政区json数据解析部分
 */
 // 获取数据
-var ADChinaJsonNSData:NSData = NSData.dataWithContentsOfURL(NSURL(string: "http://martini.wang/dev_resources/ADChina.json"), options: NSDataReadingOptions.DataReadingUncached, error: nil)
+var ADChinaJsonNSData:NSData = NSData(contentsOfURL: NSURL(string: "http://martini.wang/dev_resources/ADChina.json")!, options: NSDataReadingOptions.UncachedRead, error: nil)!//.dataWithContentsOfURL(NSURL(string: "http://martini.wang/dev_resources/ADChina.json")!, options: NSDataReadingOptions.DataReadingUncached, error: nil)
 //用SwiftJSON解析数据
 var ADChinaSwiftJSON = JSON(data: ADChinaJsonNSData, options: NSJSONReadingOptions.AllowFragments, error: nil)
 // 行政区查询函数
@@ -52,6 +52,7 @@ func ADInquiry (provinceIndex:Int, cityIndex:Int?, districtIndex:Int?) -> String
         return ADChinaSwiftJSON["result"][provinceIndex]["city"][cityIndex!]["district"][districtIndex!]["district"].stringValue
     }
 }
+//let ADChinaPickerVC:ADPickerViewController = ADPickerViewController()
 
 /*
 界面自适应部分

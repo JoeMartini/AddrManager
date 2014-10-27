@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MyProfileEditViewController: UIViewController, UITextFieldDelegate, UIPickerViewDelegate, UIPickerViewDataSource {
+class MyProfileEditViewController: UIViewController {
     
     @IBOutlet var backgroundUIView: UIView!
     @IBOutlet weak var nameTextField: UITextField!
@@ -23,20 +23,23 @@ class MyProfileEditViewController: UIViewController, UITextFieldDelegate, UIPick
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        // 借由NSNotification获取键盘事件信息
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
-        
         // 选择框的委托设置
-        addrPicker.dataSource = self
-        addrPicker.delegate = self
+        let ADChinaPickerVC:ADPickerViewController = ADPickerViewController()
+        self.addChildViewController(ADChinaPickerVC)
+        addrPicker.dataSource = ADChinaPickerVC
+        addrPicker.delegate = ADChinaPickerVC
         
         // 输入框委托设置
-        nameTextField.delegate = self
-        addrdetailTextField.delegate = self
-        provinceTextField.delegate = self
-        cityTextField.delegate = self
-        districtTextField.delegate = self
+        let autoadjustTFVC:AutoadjustTextFieldVC = AutoadjustTextFieldVC()
+        autoadjustTFVC.view.hidden = true
+        self.view.addSubview(autoadjustTFVC.view)
+        self.addChildViewController(autoadjustTFVC)
+        
+        nameTextField.delegate = autoadjustTFVC
+        addrdetailTextField.delegate = autoadjustTFVC
+        provinceTextField.delegate = autoadjustTFVC
+        cityTextField.delegate = autoadjustTFVC
+        districtTextField.delegate = autoadjustTFVC
         
     }
     
@@ -50,7 +53,7 @@ class MyProfileEditViewController: UIViewController, UITextFieldDelegate, UIPick
     ProfileVC 重新加载页面
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "myProfileEditDone" {
+        if segue.identifier? == "myProfileEditDone" {
             updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
             myProfile["Name"] = nameTextField.text
             myProfile["Address"] = address
@@ -65,49 +68,16 @@ class MyProfileEditViewController: UIViewController, UITextFieldDelegate, UIPick
     
     @IBAction func nameEditEnd(sender: AnyObject) {
         println("\(nameTextField.text)")
-        //addrdetailTextFieldTapped(self)
     }
     @IBAction func addrdetailEditEnd(sender: AnyObject) {
         println(address)
     }
     
-    // 键盘return键响应函数
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
-        switch textField {
-        case nameTextField :
-            break
-        case addrdetailTextField :
-            updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], textField.text)
-        default :
-            break
-        }
-        textField.resignFirstResponder()
-        return true
-    }
-    
-    /*
-    键盘弹出、收回时界面自适应
-    只适用于设置了touchdown事件，并标记为currentTextField的输入框
-    */
     // 点击下方TextField时，标记当前TextField
     @IBAction func addrdetailTextFieldTapped(sender: AnyObject) {
         currentTextField = addrdetailTextField
     }
-    // 响应键盘弹出事件，获取键盘参数
-    func keyboardWillShow (notification: NSNotification) {
-        var keyboardRect: CGRect = (notification.userInfo![UIKeyboardFrameEndUserInfoKey] as NSValue).CGRectValue()
-        // 若键盘盖住输入框，则调整界面（需标记当前输入框，即手动设置其参与调解）
-        if currentTextField.frame.maxY > keyboardRect.minY {
-            // viewAdjustToKeyboard(keyboardRect, textField: currentTextField)
-            var dy = keyboardRect.minY - (currentTextField.frame.maxY + currentTextField.superview!.frame.minY) - 8
-            UIView.animateWithDuration(0.3, animations: {currentTextField.superview!.frame.offset(dx: 0, dy: dy)})
-        }
-        currentTextField = UITextField()
-    }
-    // 键盘收起时，系统通知响应
-    func keyboardWillHide (notification: NSNotification) {
-        UIView.animateWithDuration(0.3, animations: {self.backgroundUIView.frame.offset(dx: 0, dy: 0 - self.backgroundUIView.frame.minY)})
-    }
+    
     // 点击背景处令输入框失去焦点，即可隐藏键盘
     @IBAction func tapOnBackgroundView(sender: UITapGestureRecognizer) {
         // 暂时按照两层view处理
@@ -122,63 +92,5 @@ class MyProfileEditViewController: UIViewController, UITextFieldDelegate, UIPick
                 }
             }
         }
-    }
-    
-    /*
-    pickView 相关
-    已实现：省、市、区三级联动
-    待时限：调整字号；自动调整列宽（部分自治区等名称过长）或自动截取（前两个字）显示
-    */
-    // returns the number of 'columns' to display.
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
-        return 3
-    }
-    // returns the # of rows in each component..
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        switch component {
-        case 0 :
-            return ADChinaSwiftJSON["result"].count
-        case 1 :
-            return ADChinaSwiftJSON["result"][addrPicker.selectedRowInComponent(0)]["city"].count
-        case 2 :
-            return ADChinaSwiftJSON["result"][addrPicker.selectedRowInComponent(0)]["city"][addrPicker.selectedRowInComponent(1)]["district"].count
-        default :
-            return 5
-        }
-    }
-    // pickerView 加载函数
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String! {
-        switch component {
-        case 0 :
-            return ADInquiry(row, nil, nil)
-        case 1 :
-            return ADInquiry(addrPicker.selectedRowInComponent(0), row, nil)
-        case 2 :
-            return ADInquiry(addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1), row)
-        default :
-            return "Error"
-        }
-    }
-    // pickerView 滚动操作响应函数
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        // 另name输入框失去焦点
-        nameTextField.resignFirstResponder()
-        // 根据操作列刷新其他列显示
-        switch component {
-        case 0 :
-            addrPicker.reloadComponent(1)
-            addrPicker.reloadComponent(2)
-            addrPicker.selectRow(0, inComponent: 1, animated: true)
-            addrPicker.selectRow(0, inComponent: 2, animated: true)
-        case 1 :
-            addrPicker.reloadComponent(2)
-            addrPicker.selectRow(0, inComponent: 2, animated: true)
-        case 2 :
-            break
-        default :
-            break
-        }
-        updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
-        println(address)
     }
 }

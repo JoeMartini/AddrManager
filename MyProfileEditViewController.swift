@@ -18,6 +18,7 @@ class MyProfileEditViewController: UIViewController {
     @IBOutlet weak var provinceTextField: UITextField!
     @IBOutlet weak var cityTextField: UITextField!
     @IBOutlet weak var districtTextField: UITextField!
+    @IBOutlet weak var zipcodeTextView: UITextView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,10 +55,11 @@ class MyProfileEditViewController: UIViewController {
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier? == "myProfileEditDone" {
-            updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
+            address = updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
+            zipcode = zipcodeInquiry(address)
             myProfile["Name"] = nameTextField.text
             myProfile["Address"] = address
-            myProfile["Zipcode"] = "\(zipcode)"
+            myProfile["Zipcode"] = zipcode
         }
     }
     
@@ -70,6 +72,9 @@ class MyProfileEditViewController: UIViewController {
         println("\(nameTextField.text)")
     }
     @IBAction func addrdetailEditEnd(sender: AnyObject) {
+        address = updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
+        zipcode = zipcodeInquiry(address)
+        zipcodeTextView.text = zipcode
         println(address)
     }
     

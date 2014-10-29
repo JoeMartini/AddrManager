@@ -18,10 +18,14 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
     @IBOutlet weak var provinceTextField: UITextField!
     @IBOutlet weak var cityTextField: UITextField!
     @IBOutlet weak var districtTextField: UITextField!
+    @IBOutlet weak var zipcodeFextView: UITextView!
+    @IBOutlet weak var zipcodeInquiryingIndicator: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
+        zipcodeInquiryingIndicator.hidden = true
         
         // 选择框的委托设置
         let ADChinaPickerVC:ADPickerViewController = ADPickerViewController()
@@ -62,10 +66,12 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
             信息规范性检测：姓名不为空；详细地址不为空
             检测通过则继续，不通过需要处理机制（弹出对话框填写or返回原界面）
             */
+            
             // 刷新地址
             address = updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
-            // 根据地址获取邮编（暂未实现）
-            zipcode = updateZipcode(address)
+            // 根据地址获取邮编
+            zipcode = zipcodeInquiry(address)
+
             // 新建用户
             addNewProfile(nameTextField.text, address, zipcode)
         case "contactAddCancel" :
@@ -84,6 +90,15 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
         //println("\(nameTextField.text)")
     }
     @IBAction func addrdetailEditEnd(sender: AnyObject) {
+        address = updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
+        //println(address)
+        zipcodeInquiryingIndicator.hidden = false
+        zipcodeInquiryingIndicator.startAnimating()
+        zipcode = zipcodeInquiry(address)
+        //println(zipcode)
+        zipcodeFextView.text = zipcode
+        zipcodeInquiryingIndicator.stopAnimating()
+        zipcodeInquiryingIndicator.hidden = true
         //println(address)
     }
     

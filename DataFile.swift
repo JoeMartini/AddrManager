@@ -23,6 +23,38 @@ var postcode:Int = zipcode.toInt()!
 func updateZipcode (address:String) -> String {
     return "000000"
 }
+/*
+实现方法：
+    php脚本抓取百度邮编搜索结果页面中的表格，输出第一页18个邮编（不包括不在表格内的第一个邮编；通常，若地址为精确到街道，则应取用第一个邮编）
+    函数中直接获取第一个邮编以字符串输出
+已知问题：
+    1. 百度邮编查询本身存在问题，若地址较新，服务器会失去响应（尤其是行政区划较新时）
+    2. 百度邮编查询数据不准确，如“山东省青岛市崂山区松岭路238号”返回邮编为266061，实际应为266100
+    3. 地址需要转换成utf－8，偶尔有转换失败
+    4. 未做错误处理
+*/
+func zipcodeInquiry (address:String) -> String {
+    if address != "" {
+        // 服务器查询地址前缀
+        let prefix:NSString = NSString(string: "http://martini.wang/dev_resources/zipcode.php?addr=")
+        // NSURL不能处理中文，需要先转换为UTF－8
+        let nsAddr:NSString = NSString(string: address)
+        let nsstrURL:NSString = prefix + nsAddr
+        let nsURL:NSURL = NSURL(string: nsstrURL.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!)!
+        // 获取返回结果，并格式化
+        let resultNSData:NSData = NSData(contentsOfURL: nsURL)!
+        let resultJSON:AnyObject = NSJSONSerialization.JSONObjectWithData(resultNSData, options: NSJSONReadingOptions.AllowFragments, error: nil)!
+        // 直接将第一个结果转换为文本，但此结果可能为空，用可选型进行判断
+        var result:String? = resultJSON.firstObject as? String
+        if result != nil {
+            return result as String!
+        }else{
+            return "000000"
+        }
+    }else{
+        return "000000"
+    }
+}
 
 // Profile
 var myProfile:[String: String] = ["ID": "0", "Name": "测试员", "Address": "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区", "Zipcode": "222222"]     // var xxx:Dicitonary 写法会再调用时报错
@@ -31,7 +63,7 @@ var allProfiles:[Int: [String: String]] = [0: myProfile, 1: anyProfile]
 // 新建个人信息
 func addNewProfile (Name:String, Address:String, Zipcode:String) {
     allProfiles[allProfiles.count] = ["ID": "\(allProfiles.count)", "Name": Name, "Address": Address, "Zipcode": Zipcode]
-    println(allProfiles[allProfiles.count - 1])
+    //println(allProfiles[allProfiles.count - 1])
 }
 
 // 地址

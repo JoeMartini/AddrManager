@@ -10,6 +10,7 @@
 		5922E41619F2C1B900EA873F /* MyProfileEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5922E41519F2C1B900EA873F /* MyProfileEditViewController.swift */; };
 		59244E1C19FB8DF5009988F5 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 59244E1B19FB8DF5009988F5 /* MapKit.framework */; };
 		5925F04219FE2C5400ED892A /* AutoadjustTextFieldViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5925F04119FE2C5400ED892A /* AutoadjustTextFieldViewController.swift */; };
+		592734B219FF731400F1E91F /* LoggingInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 592734B119FF731400F1E91F /* LoggingInViewController.swift */; };
 		5942F6AB19FB73B100B37036 /* MapOfPostcardsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942F6AA19FB73B100B37036 /* MapOfPostcardsViewController.swift */; };
 		5942F6AD19FB769A00B37036 /* ContactAddViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5942F6AC19FB769A00B37036 /* ContactAddViewController.swift */; };
 		5944869D19FA32E8005561A2 /* DataFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5922E3DE19F2655700EA873F /* DataFile.swift */; };
@@ -41,6 +42,7 @@
 		5922E41519F2C1B900EA873F /* MyProfileEditViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyProfileEditViewController.swift; sourceTree = "<group>"; };
 		59244E1B19FB8DF5009988F5 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		5925F04119FE2C5400ED892A /* AutoadjustTextFieldViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoadjustTextFieldViewController.swift; sourceTree = "<group>"; };
+		592734B119FF731400F1E91F /* LoggingInViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoggingInViewController.swift; sourceTree = "<group>"; };
 		5942F6AA19FB73B100B37036 /* MapOfPostcardsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapOfPostcardsViewController.swift; sourceTree = "<group>"; };
 		5942F6AC19FB769A00B37036 /* ContactAddViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactAddViewController.swift; sourceTree = "<group>"; };
 		5953354919EFAF6B005BD9DB /* AddrManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AddrManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -152,6 +154,7 @@
 				5922E41519F2C1B900EA873F /* MyProfileEditViewController.swift */,
 				5942F6AA19FB73B100B37036 /* MapOfPostcardsViewController.swift */,
 				5953355219EFAF6B005BD9DB /* ViewController.swift */,
+				592734B119FF731400F1E91F /* LoggingInViewController.swift */,
 			);
 			name = ViewControllers;
 			sourceTree = "<group>";
@@ -264,6 +267,7 @@
 				5944869D19FA32E8005561A2 /* DataFile.swift in Sources */,
 				5922E41619F2C1B900EA873F /* MyProfileEditViewController.swift in Sources */,
 				5942F6AB19FB73B100B37036 /* MapOfPostcardsViewController.swift in Sources */,
+				592734B219FF731400F1E91F /* LoggingInViewController.swift in Sources */,
 				59F24C2F19FE03400023407E /* SwiftyJSON.swift in Sources */,
 				5925F04219FE2C5400ED892A /* AutoadjustTextFieldViewController.swift in Sources */,
 				59F24C2C19FDFF760023407E /* ADPickerViewController.swift in Sources */,

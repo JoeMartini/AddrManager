@@ -18,7 +18,7 @@
 
 import UIKit
 
-class ContactlistTableViewController: UITableViewController {
+class ContactlistTableViewController: UITableViewController, UIActionSheetDelegate {
 
     @IBOutlet var contactListTableView: UITableView!
     
@@ -34,17 +34,63 @@ class ContactlistTableViewController: UITableViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    /*
+    更新按钮相关部分
+    */
+    // 触发更新
+    @IBAction func updateActionSheet(sender: AnyObject) {
+        let updateActionSheet:UIActionSheet = UIActionSheet(title: nil, delegate: self, cancelButtonTitle: "Cancel", destructiveButtonTitle: "Update All", otherButtonTitles: "Choose to Update")
+        updateActionSheet.showInView(self.view)
+    }
+    /* 
+    ActionSheet按钮响应函数
+    ButtonIndex:
+        0. 默认（缺省）按钮
+        1. 取消按钮
+        2. OtherButton中第1个，此后依此类推
+    */
+    func actionSheet(actionSheet: UIActionSheet, clickedButtonAtIndex buttonIndex: Int) {
+        switch buttonIndex {
+        case 0 : // destructive button
+            /*
+            此处应进行向服务器发送更新所有地址过期用户地址信息的请求
+            若允许用户输入自定义内容，此时弹出相应界面
+            */
+            var contactUpdateViewController:ContactUpdateViewController = ContactUpdateViewController()
+            var navControllerToUpdateView:UINavigationController = UINavigationController(rootViewController: contactUpdateViewController)
+            // 此处应首先获取所有需要更新用户之索引，暂时以所有用户代替
+            contactUpdateViewController.updateIndex = Array(allProfiles.keys)
+            self.presentViewController(navControllerToUpdateView, animated: true, completion: nil)
+            
+            println("shall update all")
+        case 2 : // second button
+            /*
+            此处应在TableView中要求用户选择此次更新的联系人
+            刷新当前列表，或显示新的页面
+            */
+            println("shall choose contacts to be updated")
+        case 1 : // cancel button
+            break
+        default :
+            println(buttonIndex)
+        }
+    }
+    
+    /*
+    TableView相关
+    */
+    // 列表行数
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return allProfiles.count
     }
-    
+    // 创建单元格
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "ContactCell")
         cell.textLabel.text = allProfiles[indexPath.row]!["Name"]!
         //println(cell.description)
         return cell
     }
-    
+    // 单元格选中响应事件
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         //println(tableView.cellForRowAtIndexPath(indexPath)?.textLabel.text)
         var contactProfileVC:ContactProfileViewController = ContactProfileViewController()
@@ -52,11 +98,18 @@ class ContactlistTableViewController: UITableViewController {
         self.navigationController?.pushViewController(contactProfileVC, animated: true)
     }
     
+    /*
+    Unwind from ContactAddViewController
+    */
     @IBAction func addDone(segue:UIStoryboardSegue) {
         
     }
     
-    @IBAction func addCancle(segue:UIStoryboardSegue) {
+    @IBAction func addCancel(segue:UIStoryboardSegue) {
+        
+    }
+    
+    @IBAction func updateCanceled(segue:UIStoryboardSegue) {
         
     }
 

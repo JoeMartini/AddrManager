@@ -10,6 +10,7 @@ import UIKit
 
 class ContactAddViewController: UIViewController,UITextFieldDelegate {
     
+    @IBOutlet weak var navBar: UINavigationBar!
     @IBOutlet var backgroundUIView: UIView!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var addrPicker: UIPickerView!
@@ -24,6 +25,7 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        //var nav = UINavigationController(rootViewController: self)
         
         zipcodeInquiryingIndicator.hidden = true
         

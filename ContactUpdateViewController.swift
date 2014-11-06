@@ -48,11 +48,11 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         var updateListLabel:UILabel = UILabel(frame: CGRect(x: viewPadding, y: messageTextView.frame.maxY + viewPadding, width: generlWidth, height: 17))
         updateListLabel.textAlignment = NSTextAlignment.Left
         updateListLabel.font = UIFont.systemFontOfSize(14)
-        updateListLabel.text = "Update list"
+        updateListLabel.text = "Update list （\(updateIndex.count) / \(allProfiles.count)）"
         self.view.addSubview(updateListLabel)
         
         // 更新用户列表
-        var updateListTable:UITableView = UITableView(frame: CGRect(x: 0, y: updateListLabel.frame.maxY + viewPadding, width: self.view.frame.width, height: self.view.frame.width))
+        var updateListTable:UITableView = UITableView(frame: CGRect(x: 0, y: updateListLabel.frame.maxY + viewPadding, width: self.view.frame.width, height: self.view.frame.maxY - updateListLabel.frame.maxY - viewPadding*2))
         updateListTable.delegate = self
         updateListTable.dataSource = self
         self.view.addSubview(updateListTable)

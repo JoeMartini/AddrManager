@@ -62,7 +62,7 @@ class ContactProfileViewController: UIViewController {
         
         // 显示信息
         nameLabel.text = profileDictionary["Name"]!
-        zipcodeTextView.text = profileDictionary["Zipcode"]!
+        zipcodeTextView.text = profileDictionary["Zipcode"]? ?? ""
         addressTextView.text = profileDictionary["Address"]!
         
         // 显示界面

@@ -10,7 +10,6 @@ import UIKit
 
 class MyProfileEditViewController: UIViewController {
     
-    @IBOutlet var backgroundUIView: UIView!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var addrPicker: UIPickerView!
     @IBOutlet weak var addrdetailTextField: UITextField!
@@ -86,7 +85,7 @@ class MyProfileEditViewController: UIViewController {
     // 点击背景处令输入框失去焦点，即可隐藏键盘
     @IBAction func tapOnBackgroundView(sender: UITapGestureRecognizer) {
         // 暂时按照两层view处理
-        for subView in backgroundUIView.subviews {
+        for subView in self.view.subviews {
             if subView.isMemberOfClass(UITextField) {
                 subView.resignFirstResponder()
             }else if (subView.subviews.count != 0) {

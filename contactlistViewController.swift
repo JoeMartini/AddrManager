@@ -19,14 +19,12 @@
 import UIKit
 
 class ContactlistTableViewController: UITableViewController, UIActionSheetDelegate {
-
-    @IBOutlet var contactListTableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
-        contactListTableView.delegate = self
+        self.tableView.dataSource = self
+        self.tableView.delegate = self
     }
 
     override func didReceiveMemoryWarning() {

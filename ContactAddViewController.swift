@@ -11,7 +11,6 @@ import UIKit
 class ContactAddViewController: UIViewController,UITextFieldDelegate {
     
     @IBOutlet weak var navBar: UINavigationBar!
-    @IBOutlet var backgroundUIView: UIView!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var addrPicker: UIPickerView!
     @IBOutlet weak var addrdetailTextField: UITextField!
@@ -49,7 +48,7 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
         
         // 加载一段测试——添加用户
         test(nameTextField, "测试员", nil)
-        test(addrdetailTextField, "中山路", "号")
+        test(addrdetailTextField, "泉城路77号", nil)
     }
     
     override func didReceiveMemoryWarning() {
@@ -68,7 +67,9 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
             信息规范性检测：姓名不为空；详细地址不为空
             检测通过则继续，不通过需要处理机制（弹出对话框填写or返回原界面）
             */
-            
+            if addrdetailTextField.text == "" {
+                println("Error,no address detail")
+            }
             // 刷新地址
             address = updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
             // 根据地址获取邮编
@@ -93,15 +94,12 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
     }
     @IBAction func addrdetailEditEnd(sender: AnyObject) {
         address = updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
-        //println(address)
         zipcodeInquiryingIndicator.hidden = false
         zipcodeInquiryingIndicator.startAnimating()
         zipcode = zipcodeInquiry(address)
-        //println(zipcode)
         zipcodeFextView.text = zipcode
         zipcodeInquiryingIndicator.stopAnimating()
         zipcodeInquiryingIndicator.hidden = true
-        //println(address)
     }
     
     // 点击下方TextField时，标记当前TextField
@@ -112,7 +110,7 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
     // 点击背景处令输入框失去焦点，即可隐藏键盘
     @IBAction func tapOnBackgroundView(sender: UITapGestureRecognizer) {
         // 暂时按照两层view处理
-        for subView in backgroundUIView.subviews {
+        for subView in self.view.subviews {
             if subView.isMemberOfClass(UITextField) {
                 subView.resignFirstResponder()
             }else if (subView.subviews.count != 0) {

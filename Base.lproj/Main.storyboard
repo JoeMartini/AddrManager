@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="n4r-Fj-eSC">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
@@ -59,13 +59,13 @@
                                 </state>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="7YV-aP-cFG">
-                                <rect key="frame" x="255" y="477" width="49" height="30"/>
+                                <rect key="frame" x="119" y="389" width="185" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Setting">
+                                <state key="normal" title="Authorization Management">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <segue destination="O1N-sM-Ktb" kind="push" identifier="settingsSet" id="cNs-l8-EZu"/>
+                                    <segue destination="O1N-sM-Ktb" kind="push" identifier="authorizationManage" id="cNs-l8-EZu"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -242,7 +242,6 @@
                     <connections>
                         <outlet property="addrPicker" destination="u0L-nH-UGl" id="HGt-tA-yDD"/>
                         <outlet property="addrdetailTextField" destination="b6c-lt-vcp" id="5Kl-K5-9cf"/>
-                        <outlet property="backgroundUIView" destination="NPs-JH-qGC" id="nfs-Lx-FIv"/>
                         <outlet property="cityTextField" destination="Umd-JB-LDM" id="uki-gN-YQO"/>
                         <outlet property="districtTextField" destination="Gha-US-nJE" id="sEZ-oY-4jZ"/>
                         <outlet property="nameTextField" destination="d0l-FA-Dzj" id="YSi-4t-JnC"/>
@@ -261,10 +260,10 @@
             </objects>
             <point key="canvasLocation" x="1430" y="344"/>
         </scene>
-        <!--Table View Controller-->
+        <!--Authorization Management-->
         <scene sceneID="GXV-hv-tCc">
             <objects>
-                <tableViewController id="O1N-sM-Ktb" sceneMemberID="viewController">
+                <tableViewController id="O1N-sM-Ktb" customClass="MyAuthorizationTableViewController" customModule="AddrManager" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="hqj-9u-m4i">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -282,7 +281,7 @@
                             <outlet property="delegate" destination="O1N-sM-Ktb" id="Fn5-kj-UN9"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="UZb-aF-SY3"/>
+                    <navigationItem key="navigationItem" title="Authorization Management" id="UZb-aF-SY3"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="qJ2-hf-DfJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -337,10 +336,10 @@
             </objects>
             <point key="canvasLocation" x="498" y="1389"/>
         </scene>
-        <!--View Controller-->
+        <!--Logging In View Controller-->
         <scene sceneID="eu4-Po-4s2">
             <objects>
-                <viewController id="n4r-Fj-eSC" sceneMemberID="viewController">
+                <viewController id="n4r-Fj-eSC" customClass="LoggingInViewController" customModule="AddrManager" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="AjW-d5-IHm">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -394,6 +393,9 @@
                                 <state key="normal" title="Inport Contact">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="ImportContactButton:" destination="n4r-Fj-eSC" eventType="touchUpInside" id="FCm-fw-cON"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -487,9 +489,6 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <connections>
-                        <outlet property="contactListTableView" destination="gLV-Xa-aQC" id="1cm-Jg-BsB"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="R8Z-j3-sQd" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -657,7 +656,6 @@
                     <connections>
                         <outlet property="addrPicker" destination="OaA-D1-Rha" id="Zzj-dS-aCA"/>
                         <outlet property="addrdetailTextField" destination="WtV-8H-w4l" id="xcb-1l-3zk"/>
-                        <outlet property="backgroundUIView" destination="8D7-bd-15r" id="sbQ-Co-4EW"/>
                         <outlet property="cityTextField" destination="mZu-v5-3yx" id="gOP-oO-msd"/>
                         <outlet property="districtTextField" destination="DVH-Dv-KvY" id="8JC-kI-ydd"/>
                         <outlet property="nameTextField" destination="Phk-Xv-aWa" id="URT-EV-NAY"/>
@@ -680,7 +678,6 @@
         <!--Navigation Controller-->
         <scene sceneID="5s6-Cj-qHV">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Qia-PD-kOu" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController id="Gx1-36-txm" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Bog-Is-iyC">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -690,6 +687,7 @@
                         <segue destination="udr-tl-YUR" kind="relationship" relationship="rootViewController" id="2kw-PA-3Q0"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Qia-PD-kOu" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1430" y="-376"/>
         </scene>

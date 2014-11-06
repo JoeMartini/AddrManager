@@ -34,6 +34,19 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
         // Dispose of any resources that can be recreated.
     }
     
+    @IBAction func ImportContactButton(sender: AnyObject) {
+        var sysContacts:Array = getSysContacts()
+        var counter:Int = allProfiles.count
+        for sysContact in sysContacts {
+            // 只导入系统通讯录中有地址的联系人
+            if sysContact["Address"] != nil && sysContact["Address"] != "" {
+                var profileIndex:Int = allProfiles.count
+                allProfiles[profileIndex] = sysContact
+                allProfiles[profileIndex]!["Zipcode"] = zipcodeInquiry(sysContact["Address"]!)
+            }
+        }
+        println("Import \(allProfiles.count - counter) contacts successfully")
+    }
     // 定位成功
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         println(locations)

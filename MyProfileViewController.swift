@@ -32,4 +32,9 @@ class MyProfileViewController: UIViewController {
     @IBAction func editDone(segue:UIStoryboardSegue) {
         self.viewDidLoad()
     }
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "authorizationManage" {
+            println("authorizationManage")
+        }
+    }
 }

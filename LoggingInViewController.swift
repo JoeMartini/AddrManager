@@ -41,8 +41,8 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
             // 只导入系统通讯录中有地址的联系人
             if sysContact["Address"] != nil && sysContact["Address"] != "" {
                 var profileIndex:Int = allProfiles.count
-                allProfiles[profileIndex] = sysContact
-                allProfiles[profileIndex]!["Zipcode"] = zipcodeInquiry(sysContact["Address"]!)
+                allProfiles.append(sysContact)
+                allProfiles[profileIndex]["Zipcode"] = zipcodeInquiry(sysContact["Address"]!)
             }
         }
         println("Import \(allProfiles.count - counter) contacts successfully")

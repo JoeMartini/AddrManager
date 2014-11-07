@@ -7,10 +7,15 @@
 //
 
 /*
+待实现：
+    1. 滑动显示置顶、删除按钮
+    2. 下拉刷新
+    3. cell自定义显示内容（姓名、头像、地址片段、更新时间）
 已实现：
     1. 从Data文件中的allProfiles字典中加载联系人信息，在列表中显示
     2. 添加按钮调出添加联系人界面，更新到allProfiles字典，返回列表时自动显示
     3. 添加联系人可以自动更新邮编
+    4. 初始界面导入系统通讯录后可显示
 已知问题：
     1. 只能添加，不能删除
     2. 邮编更新逻辑不清楚（应该在什么时间更新address和zipcode变量）
@@ -57,7 +62,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
             var contactUpdateViewController:ContactUpdateViewController = ContactUpdateViewController()
             var navControllerToUpdateView:UINavigationController = UINavigationController(rootViewController: contactUpdateViewController)
             // 此处应首先获取所有需要更新用户之索引，暂时以所有用户代替
-            contactUpdateViewController.updateIndex = Array(allProfiles.keys)
+            contactUpdateViewController.updateIndex = buildContactUpdateIndexArray(allProfiles.endIndex)
             self.presentViewController(navControllerToUpdateView, animated: true, completion: nil)
             
             println("shall update all")
@@ -83,8 +88,9 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     }
     // 创建单元格
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "ContactCell")
-        cell.textLabel.text = allProfiles[indexPath.row]!["Name"]!
+        var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "contactListCell")
+        
+        cell.textLabel.text = allProfiles[indexPath.row]["Name"]!
         //println(cell.description)
         return cell
     }
@@ -94,6 +100,25 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         var contactProfileVC:ContactProfileViewController = ContactProfileViewController()
         contactProfileVC.profileIndex = indexPath.row
         self.navigationController?.pushViewController(contactProfileVC, animated: true)
+    }
+    /*
+    系统自带滑动删除
+    添加后删除会因为索引值重复而溢出
+    （此“删除”实际应为“隐藏”）
+    */
+    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
+    }
+    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
+        return UITableViewCellEditingStyle.Delete
+    }
+    override func tableView(tableView: UITableView, titleForDeleteConfirmationButtonForRowAtIndexPath indexPath: NSIndexPath) -> String! {
+        return "Delete"
+    }
+    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath){
+        println("Delete row \(indexPath.row)")
+        allProfiles.removeAtIndex(indexPath.row)
+        self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
     }
     
     /*

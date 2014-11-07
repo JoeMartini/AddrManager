@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {//UITableViewController
+class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     var updateIndex:[Int] = [0]
     var testData:[String] = ["小白","小明","小喵"]
@@ -82,7 +82,7 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "updateListCell")
         var profileIndex:Int = updateIndex[indexPath.row]
-        cell.textLabel.text = allProfiles[profileIndex]!["Name"]!//testData[indexPath.row]
+        cell.textLabel.text = allProfiles[profileIndex]["Name"]!//testData[indexPath.row]
         return cell
     }
 }

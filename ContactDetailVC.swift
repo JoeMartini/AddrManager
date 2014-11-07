@@ -17,7 +17,7 @@ class ContactProfileViewController: UIViewController {
         // Do any additional setup after loading the view, typically from a nib.
         
         // 加载信息
-        var profileDictionary:[String: String] = allProfiles[profileIndex]!
+        var profileDictionary:[String: String] = allProfiles[profileIndex]
         
         // 导航标题
         self.navigationController?.title = profileDictionary["Name"]!

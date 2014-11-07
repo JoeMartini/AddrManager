@@ -33,10 +33,18 @@ var myAddressAuthorizationList:[Int:[String:String]] = [0:["Name":"myself", "Lim
 ID｜姓名｜地址｜邮编｜更新日期｜查看权限｜有效期
 */
 var anyProfile:[String: String] = ["ID": "1", "Name": "测试员1", "Address": "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区", "Zipcode": "333333"]
-var allProfiles:[Int: [String: String]] = [0: myProfile, 1: anyProfile]
+var allProfiles:[[String: String]] = [myProfile, anyProfile]
 // 新建个人信息
 func addNewProfile (Name:String, Address:String, Zipcode:String) {
-    allProfiles[allProfiles.count] = ["ID": "\(allProfiles.count)", "Name": Name, "Address": Address, "Zipcode": Zipcode]
+    allProfiles.append(["ID": "\(allProfiles.count)", "Name": Name, "Address": Address, "Zipcode": Zipcode])
+}
+// 生成更新联系人时索引数组（暂时为全部联系人）
+func buildContactUpdateIndexArray(endIndex:Int) -> [Int]{
+    var contactsIndexToUpdate:Array = [Int]()
+    for i in 0 ..< endIndex {
+        contactsIndexToUpdate.append(i)
+    }
+    return contactsIndexToUpdate
 }
 
 // 地址

@@ -57,11 +57,10 @@ func getSysContacts() -> [[String:String]] {
                         valueDictionary[label+"_City"] = addrNSDict.valueForKey(kABPersonAddressCityKey) as? String ?? ""
                         valueDictionary[label+"_Street"] = addrNSDict.valueForKey(kABPersonAddressStreetKey) as? String ?? ""
                         valueDictionary[label+"_Contrycode"] = addrNSDict.valueForKey(kABPersonAddressCountryCodeKey) as? String ?? ""
-                        /*
-                        存在问题：存在多个地址时，前一个地址会被覆盖掉
-                        */
+
                         // 地址整理（国家和国家代码通过“三目运算”取不为空者，若均为空未处理）
-                        valueDictionary["Address"] = (valueDictionary[label+"_Country"]! == "" ? valueDictionary[label+"_Contrycode"]! : valueDictionary[label+"_Country"]!) + ", " + valueDictionary[label+"_State"]! + ", " + valueDictionary[label+"_City"]! + ", " + valueDictionary[label+"_Street"]!
+                        var tmpAddrKey:String = i>0 ? "Address\(i)" : "Address"    // 解决后一个地址覆盖前一个地址的问题 —— 第一个地址仍然标记为Address，其他的标记为Address1等
+                        valueDictionary[tmpAddrKey] = (valueDictionary[label+"_Country"]! == "" ? valueDictionary[label+"_Contrycode"]! : valueDictionary[label+"_Country"]!) + ", " + valueDictionary[label+"_State"]! + ", " + valueDictionary[label+"_City"]! + ", " + valueDictionary[label+"_Street"]!
                         // SNS
                     case kABPersonSocialProfileProperty :
                         var snsNSDict:NSMutableDictionary = value.takeRetainedValue() as NSMutableDictionary

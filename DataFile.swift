@@ -28,6 +28,7 @@ func test (textField:UITextField, str1:String, str2:String?) {
 var myProfile:[String: String] = ["ID": "0", "Name": "测试员", "Address": "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区", "Zipcode": "222222", "Update":"2014-10-29", "Validity period":"forever"]
 // 地址管理
 var myAddressAuthorizationList:[Int:[String:String]] = [0:["Name":"myself", "Limit":"forever"], 1:["Name":"测试员", "Limit":"one week"]]
+
 /*
 联系人资料
 ID｜姓名｜地址｜邮编｜更新日期｜查看权限｜有效期
@@ -46,6 +47,8 @@ func buildContactUpdateIndexArray(endIndex:Int) -> [Int]{
     }
     return contactsIndexToUpdate
 }
+
+
 
 // 地址
 var address:String = ""
@@ -118,6 +121,8 @@ func ADInquiry (provinceIndex:Int, cityIndex:Int?, districtIndex:Int?) -> String
         return ADChinaSwiftJSON["result"][provinceIndex]["city"][cityIndex!]["district"][districtIndex!]["district"].stringValue
     }
 }
+
+
 
 /*
 界面自适应部分

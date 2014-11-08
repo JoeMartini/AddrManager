@@ -5,7 +5,9 @@
 //  Created by Martini Wang on 14/10/28.
 //  Copyright (c) 2014年 Martini Wang. All rights reserved.
 //
+/*
 
+*/
 import UIKit
 import CoreLocation
 
@@ -15,6 +17,11 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
     }
     
     func prepareLocation () {
@@ -29,12 +36,12 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.startUpdatingLocation()
     }
     
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    @IBAction func registrationButton(sender: AnyObject) {
+        
     }
     
-    @IBAction func ImportContactButton(sender: AnyObject) {
+    // 暂时用按钮触发通讯录导入
+    @IBAction func importContactButton(sender: AnyObject) {
         var sysContacts:Array = getSysContacts()
         var counter:Int = allProfiles.count
         for sysContact in sysContacts {

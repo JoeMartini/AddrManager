@@ -8,17 +8,16 @@
 
 /*
 待实现：
-    1. 滑动显示置顶、删除按钮
-    2. 下拉刷新
-    3. cell自定义显示内容（姓名、头像、地址片段、更新时间）
+    1. 下拉刷新
+    2. cell自定义显示内容（姓名、头像、地址片段、更新时间）
 已实现：
     1. 从Data文件中的allProfiles字典中加载联系人信息，在列表中显示
     2. 添加按钮调出添加联系人界面，更新到allProfiles字典，返回列表时自动显示
     3. 添加联系人可以自动更新邮编
     4. 初始界面导入系统通讯录后可显示
+    5. 滑动删除
 已知问题：
-    1. 只能添加，不能删除
-    2. 邮编更新逻辑不清楚（应该在什么时间更新address和zipcode变量）
+    1. 邮编更新逻辑不清楚（应该在什么时间更新address和zipcode变量）
 */
 
 import UIKit
@@ -116,7 +115,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         return "Delete"
     }
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath){
-        println("Delete row \(indexPath.row)")
+        //println("Delete row \(indexPath.row)")
         allProfiles.removeAtIndex(indexPath.row)
         self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
     }

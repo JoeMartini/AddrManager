@@ -1,76 +1,107 @@
 //
-//  DataFile.swift
+//  GIChina.swift
 //  AddrManager
 //
-//  Created by Martini Wang on 14/10/18.
+//  Created by Martini Wang on 14/11/9.
 //  Copyright (c) 2014年 Martini Wang. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
-// 测试代码
-func test (textField:UITextField, str1:String, str2:String?) {
-    if (str2 != nil) {
-        textField.text = str1 + "\(allProfiles.count * 10)" + str2!
-    }else{
-        textField.text = str1 + "\(allProfiles.count)"
+struct Address {
+    
+    var identifier:String?
+    
+    var provinceIndex:Int?
+    var province:String?
+    var cityIndex:Int?
+    var city:String?
+    var districtIndex:Int?
+    var district:String?
+    var street:String?
+    
+    var full:String
+    
+    var zipcode:String
+    var postcode:Int?
+    var validityPeriod:addrValidityPeriod?
+    
+    init () {
+        self.full = ""
+        self.zipcode = "000000"
+    }
+    
+    init (province:String?, city:String?, district:String?, street:String?) {
+        self.province = province
+        self.city = city
+        self.district = district
+        self.full = updateAddressDirectly([province ?? "", city ?? "", district ?? ""], street)
+        self.zipcode = zipcodeInquiry(self.full)
+        self.postcode = self.zipcode.toInt()
+    }
+    
+    init (province:String?, city:String?, district:String?, street:String?, identifier:String) {
+        self = Address(province: province, city: city, district: district, street: street)
+        self.identifier = identifier
+    }
+    
+    init (provinceIndex:Int, cityIndex:Int, districtIndex:Int, street:String?) {
+        self.provinceIndex = provinceIndex
+        self.cityIndex = cityIndex
+        self.districtIndex = districtIndex
+        self.province = ADInquiry(provinceIndex, nil, nil)
+        self.city = ADInquiry(provinceIndex, cityIndex, nil)
+        self.district = ADInquiry(provinceIndex, cityIndex, districtIndex)
+        self.full = updateAddressDirectly([self.province!, self.city!, self.district!], street)
+        self.zipcode = zipcodeInquiry(self.full)
+        self.postcode = self.zipcode.toInt()
+    }
+    
+    init (provinceIndex:Int, cityIndex:Int, districtIndex:Int, street:String?, identifier:String) {
+        self = Address(provinceIndex: provinceIndex, cityIndex: cityIndex, districtIndex: districtIndex, street: street)
+        self.identifier = identifier
+    }
+    
+    init (fullAddress:String) {
+        self.full = fullAddress
+        self.zipcode = zipcodeInquiry(self.full)
+        self.postcode = self.zipcode.toInt()
+    }
+    
+    init (fullAddress:String, identifier:String) {
+        self = Address(fullAddress: fullAddress)
+        self.identifier = identifier
     }
 }
 
-/*
-个人资料、个人地址管理
-1. 个人资料
-    ID｜姓名｜地址｜邮编｜更新日期｜有效期
-2. 地址管理
-    请求列表｜授权状态｜授权时限
-*/
-// 个人资料
-var myProfile:[String: String] = ["ID": "0", "Name": "测试员", "Address": "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区", "Zipcode": "222222", "Update":"2014-10-29", "Validity period":"forever"]
-// 地址管理
-var myAddressAuthorizationList:[Int:[String:String]] = [0:["Name":"myself", "Limit":"forever"], 1:["Name":"测试员", "Limit":"one week"]]
+var myAddress:Address = Address(fullAddress: "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区")
 
-/*
-联系人资料
-ID｜姓名｜地址｜邮编｜更新日期｜查看权限｜有效期
-*/
-var anyProfile:[String: String] = ["ID": "1", "Name": "测试员1", "Address": "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区", "Zipcode": "333333"]
-var allProfiles:[[String: String]] = [myProfile, anyProfile]
-// 新建个人信息
-func addNewProfile (Name:String, Address:String, Zipcode:String) {
-    allProfiles.append(["ID": "\(allProfiles.count)", "Name": Name, "Address": Address, "Zipcode": Zipcode])
-}
-// 生成更新联系人时索引数组（暂时为全部联系人）
-func buildContactUpdateIndexArray(endIndex:Int) -> [Int]{
-    var contactsIndexToUpdate:Array = [Int]()
-    for i in 0 ..< endIndex {
-        contactsIndexToUpdate.append(i)
-    }
-    return contactsIndexToUpdate
+enum addrValidityPeriod:Int {
+    case forever
+    case oneMonth
+    case threeMonths
+    case sixMonths
+    case oneYear
+    case fourYears
 }
 
-
-
-// 地址
-var address:String = ""
-// 地址更新，传入整数数组，作为行政区划查询索引值
-func updateAddress (ADIndexs:[Int], detail:String) -> String {
-    var address = ""
+// 地址更新
+func updateAddress (ADIndexs:[Int], street:String?) -> String {
     var ADs:[String] = [ADInquiry(ADIndexs[0], nil, nil), ADInquiry(ADIndexs[0], ADIndexs[1], nil), ADInquiry(ADIndexs[0], ADIndexs[1], ADIndexs[2])]
+    return updateAddressDirectly(ADs, street)
+}
+func updateAddressDirectly (ADs:[String], street:String?) -> String {
+    var address = ""
     for AD in ADs {
         if !address.hasPrefix(AD) {     // 避免直辖市重复两添加，如“上海市上海市”
-            address += AD
+            address += (AD + " ")
         }
     }
-    address += detail
+    address += street ?? ""
     return address
 }
 
 // 邮编
-var zipcode:String = "123456"
-var postcode:Int = zipcode.toInt()!
-func updateZipcode (address:String) -> String {
-    return "000000"
-}
 /*
 邮编查询函数
 实现方法：
@@ -122,18 +153,7 @@ func ADInquiry (provinceIndex:Int, cityIndex:Int?, districtIndex:Int?) -> String
     }
 }
 
-
-
-/*
-界面自适应部分
-*/
-// 用于在界面中有多个文本框，需要根据键盘调节界面高度时，标记当前文本框
-var currentTextField:UITextField = UITextField()
-// 暂时只跟随UITextField调节View
-func viewAdjustToKeyboard (keyboardRect: CGRect, textField: UITextField) {
-    var dy = keyboardRect.minY - (textField.frame.maxY + textField.superview!.frame.minY) - 8
-    UIView.animateWithDuration(0.1, animations: {textField.superview!.frame.offset(dx: 0, dy: dy)})
-}
+/*-*-*-*-*-*-*-*-*-*-以下无正文-*-*-*-*-*-*-*-*-*-*/
 
 /*
 var countries:Array = ["中国"]
@@ -142,29 +162,29 @@ var citiesToDisplay:Array = [String]()
 var districtsToDisplay:Array = [String]()
 */
 /*  使用自带 NSJSONSerialization （不简便）
-var ADChinaNSJson:AnyObject = NSJSONSerialization.JSONObjectWithData(ADChinaJsonNSData, options: NSJSONReadingOptions.AllowFragments, error: nil)!  
+var ADChinaNSJson:AnyObject = NSJSONSerialization.JSONObjectWithData(ADChinaJsonNSData, options: NSJSONReadingOptions.AllowFragments, error: nil)!
 */
 /*
 func updateProvinces () {
-    for provinceID in 0...ADChinaSwiftJSON["result"].count-1 {
-        provinces.append( ADChinaSwiftJSON["result"][provinceID]["province"].stringValue )
-        println( ADChinaSwiftJSON["result"][provinceID]["province"].stringValue )
-    }
+for provinceID in 0...ADChinaSwiftJSON["result"].count-1 {
+provinces.append( ADChinaSwiftJSON["result"][provinceID]["province"].stringValue )
+println( ADChinaSwiftJSON["result"][provinceID]["province"].stringValue )
+}
 
 }
 func updateCities (provinceID:Int) {
-    for cityID in 0...ADChinaSwiftJSON["result"][provinceID]["city"].count-1 {
-        citiesToDisplay.append(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["city"].stringValue)
-        println(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["id"].stringValue)
-        println(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["city"].stringValue)
-    }
+for cityID in 0...ADChinaSwiftJSON["result"][provinceID]["city"].count-1 {
+citiesToDisplay.append(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["city"].stringValue)
+println(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["id"].stringValue)
+println(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["city"].stringValue)
+}
 }
 func updateDistrict (provinceID:Int, cityID:Int) {
-    for districtID in 0...ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["district"].count-1 {
-        districtsToDisplay.append(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["district"][districtID]["district"].stringValue)
-        println(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["district"][districtID]["id"].stringValue)
-        println(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["district"][districtID]["district"].stringValue)
-    }
+for districtID in 0...ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["district"].count-1 {
+districtsToDisplay.append(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["district"][districtID]["district"].stringValue)
+println(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["district"][districtID]["id"].stringValue)
+println(ADChinaSwiftJSON["result"][provinceID]["city"][cityID]["district"][districtID]["district"].stringValue)
+}
 }
 */
 /*

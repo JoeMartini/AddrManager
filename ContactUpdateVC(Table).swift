@@ -11,7 +11,8 @@ import UIKit
 class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     // 更新列表索引
-    var updateIndex:[Int] = [0]
+    var updateIndex = [[Int]]()
+    var tmpUpdateArray = [Profile]()
     
     // 界面控件
     var messageLabel:UILabel = UILabel()
@@ -23,6 +24,8 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
+        tmpUpdateArray = buildUpdateProfileArray(updateIndex)
+        
         self.view.backgroundColor = UIColor.whiteColor()
         let viewPadding:CGFloat = 16
         let viewWidth = self.view.frame.width
@@ -30,9 +33,12 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         
         // 导航栏
         self.navigationItem.title = "Update"
+        
         var navBarLeftButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: "updateCancel:")
-        var navBarRightButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Done, target: self, action: "startUpdate:")
         self.navigationItem.setLeftBarButtonItem(navBarLeftButton, animated: true)
+        
+        var navBarRightButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Done, target: self, action: "startUpdate:")
+        self.navigationItem.setRightBarButtonItem(navBarRightButton, animated: true)
         
         // message
         messageLabel = UILabel(frame: CGRect(x: viewPadding, y: 64 + viewPadding, width: generlWidth, height: 17))
@@ -55,7 +61,7 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         updateListLabel = UILabel(frame: CGRect(x: viewPadding, y: messageTextView.frame.maxY + viewPadding, width: generlWidth, height: 17))
         updateListLabel.textAlignment = NSTextAlignment.Left
         updateListLabel.font = UIFont.systemFontOfSize(14)
-        updateListLabel.text = "Update list （\(updateIndex.count) / \(allProfiles.count)）"
+        updateListLabel.text = "Update list （\(tmpUpdateArray.count)）"
         self.view.addSubview(updateListLabel)
         
         // 更新用户列表
@@ -70,6 +76,8 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+
     
     /*
     导航栏按钮响应函数
@@ -92,12 +100,11 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
     更新列表表格设置部分
     */
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return updateIndex.count//testData.count
+        return tmpUpdateArray.count//testData.count
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "updateListCell")
-        var profileIndex:Int = updateIndex[indexPath.row]
-        cell.textLabel.text = allProfiles[profileIndex]["Name"]!//testData[indexPath.row]
+        cell.textLabel.text = tmpUpdateArray[indexPath.row].name
         return cell
     }
     /*
@@ -113,8 +120,7 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         return "Delete"
     }
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath){
-        //println("Delete row \(indexPath.row)")
-        updateIndex.removeAtIndex(indexPath.row)
+        tmpUpdateArray.removeAtIndex(indexPath.row)
         updateListTable.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
         
         updateListLabel.text = "Update list （\(updateIndex.count) / \(allProfiles.count)）"

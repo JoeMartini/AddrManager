@@ -26,8 +26,13 @@ class MyAuthorizationTableViewController: UITableViewController {
         return myAddressAuthorizationList.count
     }
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "authorizationListCell")
-        cell.textLabel.text = myAddressAuthorizationList[indexPath.row]!["Name"]! + " in " + myAddressAuthorizationList[indexPath.row]!["Limit"]! //testData[indexPath.row]
+        var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Value1, reuseIdentifier: "authorizationListCell")
+        cell.textLabel.text = myAddressAuthorizationList[indexPath.row].user.name
+        cell.detailTextLabel?.text = "\(myAddressAuthorizationList[indexPath.row].limitPeriod)"
         return cell
+    }
+    // 单元格选中响应事件
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        println("Change this authorization")
     }
 }

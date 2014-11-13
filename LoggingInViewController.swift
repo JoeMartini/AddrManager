@@ -21,7 +21,7 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
         // Do any additional setup after loading the view, typically from a nib.
         autoTFDelegate([userIDInputTextField, passwordInputTextField], self)
         
-        println("\(today.year())\(today.month())\(today.day())")
+        println("\(today.year)\(today.month)\(today.day)")
     }
     
     override func didReceiveMemoryWarning() {

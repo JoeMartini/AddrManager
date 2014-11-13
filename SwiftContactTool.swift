@@ -8,9 +8,9 @@
 
 /*
 1. 需要项目引入Address框架
-2. 主函数getSysContacts()返回经过解析的数组，每个联系人的信息为一个字典
-3. 调用方式：let sysContacts:Array = getSysContacts()
-4. 输出（Xcode6.1模拟器通讯录，手动添加Twitter、纪念日、URL）：
+2. 需要自定义的Profile结构体
+3. 主函数getSysContacts()返回经过解析的数组，每个联系人的信息为一个字典
+4. 调用方式：let sysContacts:Array = getSysContacts()
 */
 
 import Foundation
@@ -22,20 +22,7 @@ func getSysContacts() -> [Profile] {
     var error:Unmanaged<CFError>?
     var addressBook: ABAddressBookRef? = ABAddressBookCreateWithOptions(nil, &error).takeRetainedValue()
     
-    let sysAddressBookStatus = ABAddressBookGetAuthorizationStatus()
-    
-    if sysAddressBookStatus == .Denied || sysAddressBookStatus == .NotDetermined {
-        // Need to ask for authorization
-        var authorizedSingal:dispatch_semaphore_t = dispatch_semaphore_create(0)
-        var askAuthorization:ABAddressBookRequestAccessCompletionHandler = { success, error in
-            if success {
-                ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue() as NSArray
-                dispatch_semaphore_signal(authorizedSingal)
-            }
-        }
-        ABAddressBookRequestAccessWithCompletion(addressBook, askAuthorization)
-        dispatch_semaphore_wait(authorizedSingal, DISPATCH_TIME_FOREVER)
-    }
+    if !checkContactAccessAuthorization() { requestContactAccessAuthorization(addressBook!) }
     
     func analyzeSysContacts(sysContacts:NSArray) -> [Profile] {
         var allContacts:Array = [Profile]()
@@ -156,4 +143,24 @@ func getSysContacts() -> [Profile] {
     }
     
     return analyzeSysContacts( ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue() as NSArray )
+}
+
+func checkContactAccessAuthorization () -> Bool {
+    let sysAddressBookStatus = ABAddressBookGetAuthorizationStatus()
+    if sysAddressBookStatus == .Denied || sysAddressBookStatus == .NotDetermined {
+        return false
+    }
+    return true
+}
+
+func requestContactAccessAuthorization (addressBook:ABAddressBookRef) {
+    var authorizedSingal:dispatch_semaphore_t = dispatch_semaphore_create(0)
+    var askAuthorization:ABAddressBookRequestAccessCompletionHandler = { success, error in
+        if success {
+            ABAddressBookCopyArrayOfAllPeople(addressBook).takeRetainedValue() as NSArray
+            dispatch_semaphore_signal(authorizedSingal)
+        }
+    }
+    ABAddressBookRequestAccessWithCompletion(addressBook, askAuthorization)
+    dispatch_semaphore_wait(authorizedSingal, DISPATCH_TIME_FOREVER)
 }

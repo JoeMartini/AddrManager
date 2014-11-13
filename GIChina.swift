@@ -24,6 +24,8 @@ struct Address {
     
     var zipcode:String
     var postcode:Int?
+    
+    var buildTime:Date?
     var validityPeriod:addrValidityPeriod?
     
     init () {
@@ -41,7 +43,7 @@ struct Address {
     }
     
     init (province:String?, city:String?, district:String?, street:String?, identifier:String) {
-        self = Address(province: province, city: city, district: district, street: street)
+        self.init(province: province, city: city, district: district, street: street)
         self.identifier = identifier
     }
     
@@ -58,7 +60,7 @@ struct Address {
     }
     
     init (provinceIndex:Int, cityIndex:Int, districtIndex:Int, street:String?, identifier:String) {
-        self = Address(provinceIndex: provinceIndex, cityIndex: cityIndex, districtIndex: districtIndex, street: street)
+        self.init(provinceIndex: provinceIndex, cityIndex: cityIndex, districtIndex: districtIndex, street: street)
         self.identifier = identifier
     }
     
@@ -69,12 +71,10 @@ struct Address {
     }
     
     init (fullAddress:String, identifier:String) {
-        self = Address(fullAddress: fullAddress)
+        self.init(fullAddress: fullAddress)
         self.identifier = identifier
     }
 }
-
-var myAddress:Address = Address(fullAddress: "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区")
 
 enum addrValidityPeriod:Int {
     case forever

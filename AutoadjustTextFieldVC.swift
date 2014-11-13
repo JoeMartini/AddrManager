@@ -5,6 +5,7 @@
 //  Created by Martini Wang on 14/10/27.
 //  Copyright (c) 2014年 Martini Wang. All rights reserved.
 //
+
 /*
 键盘弹出、收回时界面自适应
 需委托此VC。调用autoTFDelegate，并传入所有输入框

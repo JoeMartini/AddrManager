@@ -6,6 +6,12 @@
 //  Copyright (c) 2014年 Martini Wang. All rights reserved.
 //
 
+/*
+个人资料（结构体）：
+    1. 必要属性：ID（年，4位随机数）、名字、地址、更新日期
+    2. 有多个地址（电话、邮箱等）时，暂时使用字典存储
+*/
+
 import Foundation
 
 struct Profile {
@@ -40,10 +46,7 @@ struct Profile {
     var resource:contactResource?
     
     init () {
-        self.userID = buildUserID()
-        self.name = ""
-        self.address = Address()
-        self.updateTime = today
+        self.init(name:"", address:Address())
     }
     
     init (name:String, address:Address) {
@@ -55,9 +58,7 @@ struct Profile {
 }
 
 func buildUserID() -> Int {
-    var tmpID:Int = "2014\(arc4random()%10)\(arc4random()%10)\(arc4random()%10)\(arc4random()%10)".toInt()!
-    println(tmpID)
-    return tmpID
+    return "\(today.year)\(arc4random()%10)\(arc4random()%10)\(arc4random()%10)\(arc4random()%10)".toInt()!
 }
 
 enum contactResource:Int {
@@ -65,9 +66,6 @@ enum contactResource:Int {
     case manualAdded
     case fromWebSite
 }
-
-var myProfile:Profile = Profile(name: "测试员", address: myAddress)
-var anyProfile:Profile = Profile(name: "测试员1", address: Address(fullAddress: "山东省青岛市崂山区松岭路238号中国海洋大学崂山校区"))
 
 struct AddrAuthorization {
     
@@ -89,9 +87,6 @@ enum authorizationPeriod:Int {
     case threeMonths
     case sixMonths
 }
-
-var myAddressAuthorizationList:[AddrAuthorization] = [AddrAuthorization(user: myProfile, limitPeriod: authorizationPeriod.forrver), AddrAuthorization(user: anyProfile, limitPeriod: authorizationPeriod.oneMonth)]
-
 
 struct ContactsGroup {
     
@@ -133,31 +128,6 @@ struct ContactsGroup {
     }
 }
 
-var defaultContactGroup = ContactsGroup(contacts: [Profile](), groupName: "Default")
-var markedContactGroup = ContactsGroup(contacts: [myProfile,anyProfile], groupName: "Marked")
-var allProfiles:[ContactsGroup] = [markedContactGroup,defaultContactGroup]
-
-/* 新建个人信息
-func addNewProfile (Name:String, Address:String, Zipcode:String, Group:String?) {
-    var needNewGroup:Bool = true
-    if Group == nil || Group == "" {
-        needNewGroup = false
-        defaultContactGroup.contacts.append(["ID": "\(allProfiles.count)", "Name": Name, "Address": Address, "Zipcode": Zipcode])
-    }else{
-        for currentGroup in allProfiles {
-            if currentGroup.groupName == Group {
-                needNewGroup = false
-                currentGroup.contacts.append(["ID": "\(allProfiles.count)", "Name": Name, "Address": Address, "Zipcode": Zipcode])
-                break
-            }
-        }
-        if needNewGroup {
-            allProfiles.append(contactGroup(contacts: [["ID": "\(allProfiles.count)", "Name": Name, "Address": Address, "Zipcode": Zipcode]], groupName: Group!))
-        }
-    }
-}
-*/
-
 // 生成更新联系人时索引数组（暂时为全部联系人）
 func buildContactUpdateIndexArray() -> [[Int]] {
     var contactsToUpdate = [[Int]]()
@@ -177,11 +147,27 @@ func buildUpdateProfileArray(updateIndex:[[Int]]) -> [Profile] {
     return tmpArray
 }
 
-func markContact (indexInDefaultGroup:Int) {
-    markedContactGroup.addContactInGroup(defaultContactGroup.contactAtIndex(indexInDefaultGroup))
-    defaultContactGroup.removeContactAtIndex(indexInDefaultGroup)
+
+
+
+/*-*-*-*-*-*-*-*-*-*-*-以下无正文-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/* 新建个人信息
+func addNewProfile (Name:String, Address:String, Zipcode:String, Group:String?) {
+var needNewGroup:Bool = true
+if Group == nil || Group == "" {
+needNewGroup = false
+defaultContactGroup.contacts.append(["ID": "\(allProfiles.count)", "Name": Name, "Address": Address, "Zipcode": Zipcode])
+}else{
+for currentGroup in allProfiles {
+if currentGroup.groupName == Group {
+needNewGroup = false
+currentGroup.contacts.append(["ID": "\(allProfiles.count)", "Name": Name, "Address": Address, "Zipcode": Zipcode])
+break
 }
-func revokeContactMark (indexInMarkedGroup:Int) {
-    defaultContactGroup.addContactInGroup(markedContactGroup.contactAtIndex(indexInMarkedGroup))
-    defaultContactGroup.removeContactAtIndex(indexInMarkedGroup)
 }
+if needNewGroup {
+allProfiles.append(contactGroup(contacts: [["ID": "\(allProfiles.count)", "Name": Name, "Address": Address, "Zipcode": Zipcode]], groupName: Group!))
+}
+}
+}
+*/

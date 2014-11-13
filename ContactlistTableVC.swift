@@ -8,17 +8,16 @@
 
 /*
 待实现：
-    1. 滑动显示置顶、删除按钮
-    2. 下拉刷新
-    3. cell自定义显示内容（姓名、头像、地址片段、更新时间）
+    1. 下拉刷新
+    2. cell自定义显示内容（姓名、头像、地址片段、更新时间）
 已实现：
-    1. 从Data文件中的allProfiles字典中加载联系人信息，在列表中显示
-    2. 添加按钮调出添加联系人界面，更新到allProfiles字典，返回列表时自动显示
-    3. 添加联系人可以自动更新邮编
+    1. 从Data文件中的allProfiles数组中加载联系人信息，在列表中显示
+    2. 添加按钮调出添加联系人界面，更新到allProfiles，返回列表时自动显示
+    3. 添加联系人可以自动更新邮编，若不成功，暂时以000000代替
     4. 初始界面导入系统通讯录后可显示
+    5. 滑动删除
 已知问题：
-    1. 只能添加，不能删除
-    2. 邮编更新逻辑不清楚（应该在什么时间更新address和zipcode变量）
+    1. 邮编更新逻辑不清楚（应该在什么时间更新address和zipcode变量）
 */
 
 import UIKit
@@ -28,6 +27,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        
         self.tableView.dataSource = self
         self.tableView.delegate = self
     }
@@ -62,7 +62,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
             var contactUpdateViewController:ContactUpdateViewController = ContactUpdateViewController()
             var navControllerToUpdateView:UINavigationController = UINavigationController(rootViewController: contactUpdateViewController)
             // 此处应首先获取所有需要更新用户之索引，暂时以所有用户代替
-            contactUpdateViewController.updateIndex = buildContactUpdateIndexArray(allProfiles.endIndex)
+            contactUpdateViewController.updateIndex = buildContactUpdateIndexArray()
             self.presentViewController(navControllerToUpdateView, animated: true, completion: nil)
             
             println("shall update all")
@@ -82,50 +82,71 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     /*
     TableView相关
     */
+    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return allProfiles.count
+    }
     // 列表行数
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return allProfiles.count
+        return allProfiles[section].count()
+    }
+    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return allProfiles[section].name
     }
     // 创建单元格
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "contactListCell")
-        
-        cell.textLabel.text = allProfiles[indexPath.row]["Name"]!
-        //println(cell.description)
+        cell.textLabel.text = allProfiles[indexPath.section].contactAtIndex(indexPath.row).name
         return cell
     }
     // 单元格选中响应事件
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        //println(tableView.cellForRowAtIndexPath(indexPath)?.textLabel.text)
         var contactProfileVC:ContactProfileViewController = ContactProfileViewController()
-        contactProfileVC.profileIndex = indexPath.row
+        contactProfileVC.groupIndex = indexPath.section
+        contactProfileVC.contactIndex = indexPath.row
         self.navigationController?.pushViewController(contactProfileVC, animated: true)
     }
+    
     /*
-    系统自带滑动删除
-    添加后删除会因为索引值重复而溢出
-    （此“删除”实际应为“隐藏”）
+    iOS8 滑动删除（自定义）
     */
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        return true
+    override func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
+        switch indexPath.section {
+        case 0 :
+            var revokeAction = UITableViewRowAction(style: UITableViewRowActionStyle.Normal, title: "Revoke") { (action, indexPath) -> Void in
+                println("\(indexPath.row) in \(indexPath.section)")
+                revokeContactMark(indexPath.row)
+                self.tableView.reloadData()
+                //self.tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: defaultContactGroup.contacts.count-1, inSection: 1)], withRowAnimation: UITableViewRowAnimation.Bottom)
+                //self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
+            }
+            revokeAction.backgroundColor = UIColor.grayColor()
+            
+            return [revokeAction]
+        default :
+            var markAction = UITableViewRowAction(style: UITableViewRowActionStyle.Normal, title: "Mark") { (action, indexPath) -> Void in
+                markContact(indexPath.row)
+                self.tableView.moveRowAtIndexPath(indexPath, toIndexPath: NSIndexPath(forRow: 0, inSection: 0))
+                //self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
+            }
+            markAction.backgroundColor = UIColor.orangeColor()
+            
+            var deleteAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Delete") { (action, indexPath) -> Void in
+                allProfiles[indexPath.section].removeContactAtIndex(indexPath.row)
+                self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
+            }
+            
+            return [deleteAction, markAction]
+        }
     }
-    override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
-        return UITableViewCellEditingStyle.Delete
-    }
-    override func tableView(tableView: UITableView, titleForDeleteConfirmationButtonForRowAtIndexPath indexPath: NSIndexPath) -> String! {
-        return "Delete"
-    }
+    
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath){
-        println("Delete row \(indexPath.row)")
-        allProfiles.removeAtIndex(indexPath.row)
-        self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
     }
     
     /*
     Unwind from ContactAddViewController
     */
     @IBAction func addDone(segue:UIStoryboardSegue) {
-        
+        self.viewDidLoad()
     }
     
     @IBAction func addCancel(segue:UIStoryboardSegue) {
@@ -139,3 +160,14 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
 
 }
 
+/* iOS7 系统自带滑动删除（仅删除按钮）
+override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+return true
+}
+override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
+return UITableViewCellEditingStyle.Delete
+}
+override func tableView(tableView: UITableView, titleForDeleteConfirmationButtonForRowAtIndexPath indexPath: NSIndexPath) -> String! {
+return "Delete"
+}
+*/

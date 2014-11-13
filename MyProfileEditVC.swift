@@ -31,16 +31,7 @@ class MyProfileEditViewController: UIViewController {
         addrPicker.delegate = ADChinaPickerVC
         
         // 输入框委托设置
-        let autoadjustTFVC:AutoadjustTextFieldVC = AutoadjustTextFieldVC()
-        self.view.addSubview(autoadjustTFVC.view)
-        self.addChildViewController(autoadjustTFVC)
-        
-        nameTextField.delegate = autoadjustTFVC
-        addrdetailTextField.delegate = autoadjustTFVC
-        provinceTextField.delegate = autoadjustTFVC
-        cityTextField.delegate = autoadjustTFVC
-        districtTextField.delegate = autoadjustTFVC
-        
+        autoTFDelegate([nameTextField,addrdetailTextField,provinceTextField,cityTextField,districtTextField], self)
     }
     
     override func didReceiveMemoryWarning() {
@@ -54,11 +45,11 @@ class MyProfileEditViewController: UIViewController {
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier? == "myProfileEditDone" {
-            address = updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
-            zipcode = zipcodeInquiry(address)
-            myProfile["Name"] = nameTextField.text
-            myProfile["Address"] = address
-            myProfile["Zipcode"] = zipcode
+            myAddress = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)
+            myProfile.address = myAddress
+            if nameTextField.text != "" && nameTextField.text != "Strongly struggest REAL name" {
+                myProfile.name = nameTextField.text
+            }
         }
     }
     
@@ -68,18 +59,11 @@ class MyProfileEditViewController: UIViewController {
     }
     
     @IBAction func nameEditEnd(sender: AnyObject) {
-        println("\(nameTextField.text)")
-    }
-    @IBAction func addrdetailEditEnd(sender: AnyObject) {
-        address = updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
-        zipcode = zipcodeInquiry(address)
-        zipcodeTextView.text = zipcode
-        println(address)
     }
     
-    // 点击下方TextField时，标记当前TextField
-    @IBAction func addrdetailTextFieldTapped(sender: AnyObject) {
-        currentTextField = addrdetailTextField
+    @IBAction func addrdetailEditEnd(sender: AnyObject) {
+        var tmpAddr:Address = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)
+        zipcodeTextView.text = tmpAddr.zipcode
     }
     
     // 点击背景处令输入框失去焦点，即可隐藏键盘

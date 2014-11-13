@@ -36,15 +36,7 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
         addrPicker.delegate = ADChinaPickerVC
         
         // 输入框委托设置
-        let autoadjustTFVC:AutoadjustTextFieldVC = AutoadjustTextFieldVC()
-        self.view.addSubview(autoadjustTFVC.view)
-        self.addChildViewController(autoadjustTFVC)
-        
-        nameTextField.delegate = autoadjustTFVC
-        addrdetailTextField.delegate = autoadjustTFVC
-        provinceTextField.delegate = autoadjustTFVC
-        cityTextField.delegate = autoadjustTFVC
-        districtTextField.delegate = autoadjustTFVC
+        autoTFDelegate([nameTextField,addrdetailTextField,provinceTextField,cityTextField,districtTextField], self)
         
         // 加载一段测试——添加用户
         test(nameTextField, "测试员", nil)
@@ -70,13 +62,8 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
             if addrdetailTextField.text == "" {
                 println("Error,no address detail")
             }
-            // 刷新地址
-            address = updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
-            // 根据地址获取邮编
-            zipcode = zipcodeInquiry(address)
-
-            // 新建用户
-            addNewProfile(nameTextField.text, address, zipcode)
+            defaultContactGroup.addContactInGroup(Profile(name: nameTextField.text, address: Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)))
+            println(defaultContactGroup.count())
         case "contactAddCancel" :
             break
         default :
@@ -93,18 +80,19 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
         //println("\(nameTextField.text)")
     }
     @IBAction func addrdetailEditEnd(sender: AnyObject) {
-        address = updateAddress([addrPicker.selectedRowInComponent(0), addrPicker.selectedRowInComponent(1),addrPicker.selectedRowInComponent(2)], addrdetailTextField.text)
         zipcodeInquiryingIndicator.hidden = false
         zipcodeInquiryingIndicator.startAnimating()
-        zipcode = zipcodeInquiry(address)
-        zipcodeFextView.text = zipcode
+        
+        var tmpAddr:Address = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)
+        zipcodeFextView.text = tmpAddr.zipcode
+        
         zipcodeInquiryingIndicator.stopAnimating()
         zipcodeInquiryingIndicator.hidden = true
     }
     
     // 点击下方TextField时，标记当前TextField
     @IBAction func addrdetailTextFieldTapped(sender: AnyObject) {
-        currentTextField = addrdetailTextField
+        //currentTextField = addrdetailTextField
     }
     
     // 点击背景处令输入框失去焦点，即可隐藏键盘

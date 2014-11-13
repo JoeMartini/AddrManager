@@ -13,14 +13,17 @@ class MyProfileViewController: UIViewController {
     @IBOutlet weak var myName: UILabel!
     @IBOutlet weak var myZipcode: UITextView!
     @IBOutlet weak var myAddress: UITextView!
+    @IBOutlet weak var AMButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        myName.text = myProfile["Name"]!
-        myZipcode.text = myProfile["Zipcode"]!
-        myAddress.text = myProfile["Address"]!
+        myName.text = myProfile.name
+        myZipcode.text = myProfile.address.zipcode
+        myAddress.text = myProfile.address.full
+        
+        AMButton.frame.offset(dx: 0, dy: (myAddress.frame.minY + myAddress.layoutManager.usedRectForTextContainer(myAddress.textContainer).height + 16)-AMButton.frame.origin.y)
     }
     
     override func didReceiveMemoryWarning() {

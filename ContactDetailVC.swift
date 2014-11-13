@@ -10,17 +10,18 @@ import UIKit
 
 class ContactProfileViewController: UIViewController {
     
-    var profileIndex:Int = 0    //联系人索引值
+    var groupIndex:Int = 0
+    var contactIndex:Int = 0    //联系人索引值
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
         // 加载信息
-        var profileDictionary:[String: String] = allProfiles[profileIndex]
+        var currentProfile:Profile = allProfiles[groupIndex].contacts[contactIndex]
         
         // 导航标题
-        self.navigationController?.title = profileDictionary["Name"]!
+        self.navigationController?.title = currentProfile.name
         
         // 建立界面
         // View
@@ -61,9 +62,9 @@ class ContactProfileViewController: UIViewController {
         addressTextView.dataDetectorTypes = UIDataDetectorTypes.Address
         
         // 显示信息
-        nameLabel.text = profileDictionary["Name"]!
-        zipcodeTextView.text = profileDictionary["Zipcode"]? ?? ""
-        addressTextView.text = profileDictionary["Address"]!
+        nameLabel.text = currentProfile.name
+        zipcodeTextView.text = currentProfile.address.zipcode
+        addressTextView.text = currentProfile.address.full
         
         // 显示界面
         self.view.addSubview(nameLabel)

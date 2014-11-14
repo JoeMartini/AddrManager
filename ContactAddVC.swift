@@ -62,8 +62,7 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
             if addrdetailTextField.text == "" {
                 println("Error,no address detail")
             }
-            defaultContactGroup.addContactInGroup(Profile(name: nameTextField.text, address: Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)))
-            println(defaultContactGroup.count())
+            allProfiles[1].addContactInGroup(Profile(name: nameTextField.text, address: Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)))
         case "contactAddCancel" :
             break
         default :

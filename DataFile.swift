@@ -30,16 +30,34 @@ var myAddress:Address = Address(fullAddress: "山东省青岛市崂山区松岭�
 
 var myAddressAuthorizationList:[AddrAuthorization] = [AddrAuthorization(user: myProfile, limitPeriod: authorizationPeriod.forrver), AddrAuthorization(user: anyProfile, limitPeriod: authorizationPeriod.oneMonth)]
 
-var defaultContactGroup = ContactsGroup(contacts: [Profile](), groupName: "Default")
-var markedContactGroup = ContactsGroup(contacts: [myProfile,anyProfile], groupName: "Marked")
-var allProfiles:[ContactsGroup] = [markedContactGroup,defaultContactGroup]
+// 0: Marked, 1: Default
+var allProfiles:[ContactsGroup] = [ContactsGroup(contacts: [myProfile,anyProfile], groupName: "Marked"),ContactsGroup(contacts: [Profile](), groupName: "Default")]
 
-func markContact (indexInDefaultGroup:Int) {
-    markedContactGroup.addContactInGroup(defaultContactGroup.contactAtIndex(indexInDefaultGroup))
-    defaultContactGroup.removeContactAtIndex(indexInDefaultGroup)
+func markOrRevoke (indexPath:NSIndexPath) {
+    var index:Int = indexPath.section == 0 ? 1 : 0
+    allProfiles[index].addContactInGroup(allProfiles[indexPath.section].removeContactAtIndex(indexPath.row)!)
 }
 
-func revokeContactMark (indexInMarkedGroup:Int) {
-    defaultContactGroup.addContactInGroup(markedContactGroup.contactAtIndex(indexInMarkedGroup))
-    defaultContactGroup.removeContactAtIndex(indexInMarkedGroup)
+// 生成更新联系人时索引数组
+func buildContactUpdateIndexArray(indexPaths:[NSIndexPath]?) -> [[Int]] {
+    var contactsToUpdate = [[Int]]()
+    if indexPaths == nil {
+        for i in 0 ..< allProfiles.count {
+            for j in 0 ..< allProfiles[i].count() {
+                contactsToUpdate.append([i,j])
+            }
+        }
+    }else{
+        for indexPath in indexPaths! {
+            contactsToUpdate.append([indexPath.section,indexPath.row])
+        }
+    }
+    return contactsToUpdate
+}
+func buildUpdateProfileArray(updateIndex:[[Int]]) -> [Profile] {
+    var tmpArray = [Profile]()
+    for key in updateIndex {
+        tmpArray.append(allProfiles[key[0]].contacts[key[1]])
+    }
+    return tmpArray
 }

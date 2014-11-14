@@ -111,11 +111,12 @@ struct ContactsGroup {
         }
     }
     
-    mutating func removeContactAtIndex(index:Int) {
+    mutating func removeContactAtIndex(index:Int) -> Profile? {
         if index > contacts.count {
             println("wrong index")
+            return nil
         }else{
-            contacts.removeAtIndex(index)
+            return contacts.removeAtIndex(index)
         }
     }
     
@@ -128,24 +129,7 @@ struct ContactsGroup {
     }
 }
 
-// 生成更新联系人时索引数组（暂时为全部联系人）
-func buildContactUpdateIndexArray() -> [[Int]] {
-    var contactsToUpdate = [[Int]]()
-    for i in 0 ..< allProfiles.count {
-        for j in 0 ..< allProfiles[i].count() {
-            contactsToUpdate.append([i,j])
-        }
-        println(contactsToUpdate.count)
-    }
-    return contactsToUpdate
-}
-func buildUpdateProfileArray(updateIndex:[[Int]]) -> [Profile] {
-    var tmpArray = [Profile]()
-    for key in updateIndex {
-        tmpArray.append(allProfiles[key[0]].contacts[key[1]])
-    }
-    return tmpArray
-}
+
 
 
 

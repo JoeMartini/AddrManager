@@ -6,27 +6,16 @@
 //  Copyright (c) 2014年 Martini Wang. All rights reserved.
 //
 
-/*
-待实现：
-    1. 下拉刷新
-    2. cell自定义显示内容（姓名、头像、地址片段、更新时间）
-已实现：
-    1. 从Data文件中的allProfiles数组中加载联系人信息，在列表中显示
-    2. 添加按钮调出添加联系人界面，更新到allProfiles，返回列表时自动显示
-    3. 添加联系人可以自动更新邮编，若不成功，暂时以000000代替
-    4. 初始界面导入系统通讯录后可显示
-    5. 滑动删除
-已知问题：
-    1. 邮编更新逻辑不清楚（应该在什么时间更新address和zipcode变量）
-*/
-
 import UIKit
 
-class ContactlistTableViewController: UITableViewController, UIActionSheetDelegate {
+class ContactlistTableViewController: UITableViewController, UIActionSheetDelegate, UIAlertViewDelegate {
+    
+    @IBOutlet weak var updateButton: UIBarButtonItem!
+    
+    var reuseAddBarButton:UIBarButtonItem = UIBarButtonItem()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         self.tableView.dataSource = self
         self.tableView.delegate = self
@@ -34,18 +23,46 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     /*
-    更新按钮相关部分
+    导航栏右侧按钮
+        默认状态：更新启动按钮，弹出更新选项
+        111状态：全选按钮（方便全选后取消少数几个人）
+        222状态：跳转到更新界面（同更新选项菜单1）
     */
-    // 触发更新
     @IBAction func updateActionSheet(sender: AnyObject) {
-        let updateActionSheet:UIActionSheet = UIActionSheet(title: nil, delegate: self, cancelButtonTitle: "Cancel", destructiveButtonTitle: "Update All", otherButtonTitles: "Choose to Update")
-        updateActionSheet.showInView(self.view)
+        switch updateButton.tag {
+        case 111 :
+            updateButton.title = "Done"
+            for indexPath in self.tableView.indexPathsForVisibleRows() as [NSIndexPath] {
+                self.tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: UITableViewScrollPosition.None)
+            }
+            updateButton.tag = 222
+        case 222 :
+            var selectedRows = self.tableView.indexPathsForSelectedRows() as? [NSIndexPath] ?? [NSIndexPath]()
+            if selectedRows.count != 0 {
+                updateWillStart(selectedRows)
+                for indexPath in selectedRows {
+                    self.tableView.deselectRowAtIndexPath(indexPath, animated: true)
+                }
+                updateButton.tag = 0
+                updateCancel(nil)
+            }else{
+                let noSelectionWarning = UIAlertView(title: "No contact selected", message: "Would you like keep selecting or stop this select", delegate: self, cancelButtonTitle: "Cancel", otherButtonTitles: "Continue")
+                noSelectionWarning.show()
+            }
+        default :
+            let updateActionSheet:UIActionSheet = UIActionSheet(title: nil, delegate: self, cancelButtonTitle: "Cancel", destructiveButtonTitle: "Update All", otherButtonTitles: "Choose to Update")
+            updateActionSheet.showInView(self.view)
+        }
     }
-    /* 
+    func alertView(alertView: UIAlertView, clickedButtonAtIndex buttonIndex: Int) {
+        if buttonIndex == 0 {
+            updateCancel(nil)
+        }
+    }
+    /*
     ActionSheet按钮响应函数
     ButtonIndex:
         0. 默认（缺省）按钮
@@ -54,29 +71,48 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     */
     func actionSheet(actionSheet: UIActionSheet, clickedButtonAtIndex buttonIndex: Int) {
         switch buttonIndex {
-        case 0 : // destructive button
-            /*
-            此处应进行向服务器发送更新所有地址过期用户地址信息的请求
-            若允许用户输入自定义内容，此时弹出相应界面
-            */
-            var contactUpdateViewController:ContactUpdateViewController = ContactUpdateViewController()
-            var navControllerToUpdateView:UINavigationController = UINavigationController(rootViewController: contactUpdateViewController)
-            // 此处应首先获取所有需要更新用户之索引，暂时以所有用户代替
-            contactUpdateViewController.updateIndex = buildContactUpdateIndexArray()
-            self.presentViewController(navControllerToUpdateView, animated: true, completion: nil)
+        case 0 :
+            updateWillStart(nil)        // 此处应首先获取所有需要更新用户之索引（已过期），暂时以所有用户代替
+        case 2 :
+            // 设置导航右侧按钮
+            updateButton.tag = 111
+            updateButton.title = "Select All"
             
-            println("shall update all")
-        case 2 : // second button
-            /*
-            此处应在TableView中要求用户选择此次更新的联系人
-            刷新当前列表，或显示新的页面
-            */
-            println("shall choose contacts to be updated")
+            // 替换导航左侧按钮（先保存）
+            reuseAddBarButton = self.navigationItem.leftBarButtonItem!
+            
+            var cancelNavButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: "updateCancel:")
+            self.navigationItem.setLeftBarButtonItem(cancelNavButton, animated: true)
+            
+            // 列表进入多选状态
+            self.tableView.allowsMultipleSelection = true
+            self.tableView.allowsMultipleSelectionDuringEditing = true
+            self.tableView.setEditing(true, animated: true)
         case 1 : // cancel button
             break
         default :
             println(buttonIndex)
         }
+    }
+    
+    // 生成更新界面
+    func updateWillStart (indexPathsToUpdate:[NSIndexPath]?) {
+        var contactUpdateViewController:ContactUpdateViewController = ContactUpdateViewController()
+        var navControllerToUpdateView:UINavigationController = UINavigationController(rootViewController: contactUpdateViewController)
+        contactUpdateViewController.updateIndex = buildContactUpdateIndexArray(indexPathsToUpdate)
+        self.presentViewController(navControllerToUpdateView, animated: true, completion: nil)
+    }
+    
+    // 恢复列表界面
+    func updateCancel (sender:AnyObject?) {
+        self.navigationItem.setLeftBarButtonItem(reuseAddBarButton, animated: true)
+        
+        updateButton.tag = 0
+        updateButton.title = "Update"
+        
+        self.tableView.allowsMultipleSelection = false
+        self.tableView.allowsMultipleSelectionDuringEditing = false
+        self.tableView.setEditing(false, animated: true)
     }
     
     /*
@@ -85,25 +121,40 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return allProfiles.count
     }
-    // 列表行数
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return allProfiles[section].count()
     }
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         return allProfiles[section].name
     }
-    // 创建单元格
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Subtitle, reuseIdentifier: "contactListCell")
+        var cell:UITableViewCell =  self.tableView.dequeueReusableCellWithIdentifier("contactListCell") as UITableViewCell
         cell.textLabel.text = allProfiles[indexPath.section].contactAtIndex(indexPath.row).name
+        cell.detailTextLabel?.text = allProfiles[indexPath.section].contactAtIndex(indexPath.row).address.full
         return cell
     }
-    // 单元格选中响应事件
+    /*
+    单元格选中响应事件
+    处在多选状态时: 1. 更新按钮中包含的选择数量, 2. 标记导航右侧按钮进入启动更新状态
+    默认状态：进入联系人地址界面
+    */
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var contactProfileVC:ContactProfileViewController = ContactProfileViewController()
-        contactProfileVC.groupIndex = indexPath.section
-        contactProfileVC.contactIndex = indexPath.row
-        self.navigationController?.pushViewController(contactProfileVC, animated: true)
+        if tableView.allowsMultipleSelection {
+            updateButton.title = "Done (\((self.tableView.indexPathsForSelectedRows()! as [NSIndexPath]).count))"
+            updateButton.tag = 222
+        }else{
+            var contactProfileVC:ContactProfileViewController = ContactProfileViewController()
+            contactProfileVC.groupIndex = indexPath.section
+            contactProfileVC.contactIndex = indexPath.row
+            self.navigationController?.pushViewController(contactProfileVC, animated: true)
+        }
+    }
+    // 单元格取消选中
+    override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
+        if tableView.allowsMultipleSelection {
+            updateButton.title = "Done (\((self.tableView.indexPathsForSelectedRows()? ?? [NSIndexPath]() ).count))"
+            updateButton.tag = 222
+        }
     }
     
     /*
@@ -113,20 +164,16 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         switch indexPath.section {
         case 0 :
             var revokeAction = UITableViewRowAction(style: UITableViewRowActionStyle.Normal, title: "Revoke") { (action, indexPath) -> Void in
-                println("\(indexPath.row) in \(indexPath.section)")
-                revokeContactMark(indexPath.row)
+                markOrRevoke(indexPath)
                 self.tableView.reloadData()
-                //self.tableView.insertRowsAtIndexPaths([NSIndexPath(forRow: defaultContactGroup.contacts.count-1, inSection: 1)], withRowAnimation: UITableViewRowAnimation.Bottom)
-                //self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
             }
             revokeAction.backgroundColor = UIColor.grayColor()
             
             return [revokeAction]
         default :
             var markAction = UITableViewRowAction(style: UITableViewRowActionStyle.Normal, title: "Mark") { (action, indexPath) -> Void in
-                markContact(indexPath.row)
-                self.tableView.moveRowAtIndexPath(indexPath, toIndexPath: NSIndexPath(forRow: 0, inSection: 0))
-                //self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
+                markOrRevoke(indexPath)
+                self.tableView.reloadData()
             }
             markAction.backgroundColor = UIColor.orangeColor()
             

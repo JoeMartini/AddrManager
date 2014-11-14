@@ -6,6 +6,12 @@
 //  Copyright (c) 2014年 Martini Wang. All rights reserved.
 //
 
+/*
+待实现：
+1. 消息字数计算
+2. 服务器交互
+*/
+
 import UIKit
 
 class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {

@@ -54,10 +54,9 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
         for sysContact in sysContacts {
             // 只导入系统通讯录中有地址的联系人
             if sysContact.address.full != "" {
-                defaultContactGroup.addContactInGroup(sysContact)
+                allProfiles[1].addContactInGroup(sysContact)//defaultContactGroup.addContactInGroup(sysContact)
             }
         }
-        println(defaultContactGroup.count())
     }
     // 定位成功
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {

@@ -15,6 +15,7 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var userIDInputTextField: UITextField!
     @IBOutlet weak var passwordInputTextField: UITextField!
+    @IBOutlet weak var contactImprotingIndicator: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -50,6 +51,9 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
     
     // 暂时用按钮触发通讯录导入
     @IBAction func importContactButton(sender: AnyObject) {
+        //contactImprotingIndicator.hidden = false
+        contactImprotingIndicator.startAnimating()
+        println(contactImprotingIndicator.isAnimating())
         var sysContacts:Array = getSysContacts()
         for sysContact in sysContacts {
             // 只导入系统通讯录中有地址的联系人
@@ -57,6 +61,7 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
                 allProfiles[1].addContactInGroup(sysContact)//defaultContactGroup.addContactInGroup(sysContact)
             }
         }
+        contactImprotingIndicator.stopAnimating()
     }
     // 定位成功
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {

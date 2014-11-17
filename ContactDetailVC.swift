@@ -44,6 +44,7 @@ class ContactProfileViewController: UIViewController {
         zipcodeTextView.font = UIFont.systemFontOfSize(20)
         zipcodeTextView.textAlignment = NSTextAlignment.Left
         zipcodeTextView.editable = false
+        zipcodeTextView.scrollEnabled = false
         zipcodeTextView.selectable = true
         
         // address

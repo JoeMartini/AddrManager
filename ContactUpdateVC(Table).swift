@@ -66,7 +66,7 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         updateListLabel = UILabel(frame: CGRect(x: viewPadding, y: messageTextView.frame.maxY + viewPadding, width: generlWidth, height: 17))
         updateListLabel.textAlignment = NSTextAlignment.Left
         updateListLabel.font = UIFont.systemFontOfSize(14)
-        updateListLabel.text = "Update list （\(tmpUpdateArray.count)）"
+        updateListLabel.text = updateContactsCount()
         self.view.addSubview(updateListLabel)
         
         // 更新用户列表
@@ -81,7 +81,9 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         super.didReceiveMemoryWarning()
     }
     
-
+    func updateContactsCount() -> String {
+        return "Update list （\(tmpUpdateArray.count)）"
+    }
     
     /*
     导航栏按钮响应函数
@@ -127,6 +129,6 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         tmpUpdateArray.removeAtIndex(indexPath.row)
         updateListTable.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
         
-        updateListLabel.text = "Update list （\(updateIndex.count) / \(allProfiles.count)）"
+        updateListLabel.text = updateContactsCount()
     }
 }

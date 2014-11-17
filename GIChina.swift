@@ -93,7 +93,7 @@ func updateAddress (ADIndexs:[Int], street:String?) -> String {
 func updateAddressDirectly (ADs:[String], street:String?) -> String {
     var address = ""
     for AD in ADs {
-        if !address.hasPrefix(AD) {     // 避免直辖市重复两添加，如“上海市上海市”
+        if !address.hasPrefix(AD) && AD != "" {     // 避免直辖市重复两添加，如“上海市上海市”；对于省份为空，避免连入空格
             address += (AD + " ")
         }
     }

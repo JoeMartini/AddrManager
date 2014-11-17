@@ -85,17 +85,26 @@ func getSysContacts() -> [Profile] {
             /*
             部分单值属性
             */
-            // 姓、姓氏拼音
+            // 名、名字拼音
             currentContact.firstName = ABRecordCopyValue(contact, kABPersonFirstNameProperty)?.takeRetainedValue() as String?
             //currentContact.firstNamePhonetic = ABRecordCopyValue(contact, kABPersonFirstNamePhoneticProperty)?.takeRetainedValue() as String?
-            // 名、名字拼音
+            // 姓、姓氏拼音
             currentContact.lastName = ABRecordCopyValue(contact, kABPersonLastNameProperty)?.takeRetainedValue() as String?
             //currentContact.lastNamePhonetic = ABRecordCopyValue(contact, kABPersonLastNamePhoneticProperty)?.takeRetainedValue() as String?
             // 昵称
             //currentContact.nikeName = ABRecordCopyValue(contact, kABPersonNicknameProperty)?.takeRetainedValue() as String?
             
             // 姓名整理
-            currentContact.name = (currentContact.firstName? ?? "") + " " + (currentContact.lastName? ?? "")
+            switch languageDetectByFirstCharacter((currentContact.firstName? ?? "") + (currentContact.lastName? ?? "")) {
+            case .Chinese :
+                // 中文
+                currentContact.name = (currentContact.lastName? ?? "") + (currentContact.firstName != nil ? " " + currentContact.firstName! : "")
+            default :
+                // 英文
+                currentContact.name = (currentContact.firstName? ?? "") + (currentContact.lastName != nil ? " " + currentContact.lastName! : "")
+            }
+
+
             
             // 公司（组织）
             //currentContact.organization = ABRecordCopyValue(contact, kABPersonOrganizationProperty)?.takeRetainedValue() as String?
@@ -163,4 +172,26 @@ func requestContactAccessAuthorization (addressBook:ABAddressBookRef) {
     }
     ABAddressBookRequestAccessWithCompletion(addressBook, askAuthorization)
     dispatch_semaphore_wait(authorizedSingal, DISPATCH_TIME_FOREVER)
+}
+
+enum language {
+    case ND
+    case Chinese
+    case Other
+}
+
+func languageDetectByFirstCharacter (str:String?) -> language {
+    if str != nil && str != "" {
+        let SimplifiedChinese = 0x4E00 ... 0x9FFF
+        for chr in str!.substringToIndex(advance(str!.startIndex, 1)).unicodeScalars {
+            switch Int(chr.value) {
+            case let x where x >= SimplifiedChinese.startIndex && x <= SimplifiedChinese.endIndex :
+                return language.Chinese
+            default :
+                return language.Other
+            }
+        }
+        return language.Other
+    }
+    return language.ND
 }

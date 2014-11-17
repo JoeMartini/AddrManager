@@ -413,10 +413,15 @@
                                 <color key="textColor" red="0.29803922772407532" green="0.29803922772407532" blue="0.29803922772407532" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" id="Kb1-dB-5Yh">
+                                <rect key="frame" x="124" y="523" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <connections>
+                        <outlet property="contactImprotingIndicator" destination="Kb1-dB-5Yh" id="0Ba-I8-2hS"/>
                         <outlet property="passwordInputTextField" destination="Rfa-26-x9a" id="nkf-r3-iPN"/>
                         <outlet property="userIDInputTextField" destination="8Q9-O1-mM2" id="wkY-JS-DUC"/>
                     </connections>

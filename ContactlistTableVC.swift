@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ContactlistTableViewController: UITableViewController, UIActionSheetDelegate, UIAlertViewDelegate {
+class ContactlistTableViewController: UITableViewController, UIActionSheetDelegate, UIAlertViewDelegate, UISearchBarDelegate {
     
     @IBOutlet weak var updateButton: UIBarButtonItem!
     
@@ -33,13 +33,16 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     */
     @IBAction func updateActionSheet(sender: AnyObject) {
         switch updateButton.tag {
-        case 111 :
+        case 111 :      // 全选
             updateButton.title = "Done"
-            for indexPath in self.tableView.indexPathsForVisibleRows() as [NSIndexPath] {
-                self.tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: UITableViewScrollPosition.None)
+            for s in 0 ..< allProfiles.count {
+                for r in 0 ..< allProfiles[s].count() {
+                    var indexPath:NSIndexPath = NSIndexPath(forRow: r, inSection: s)
+                    self.tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: UITableViewScrollPosition.None)
+                }
             }
             updateButton.tag = 222
-        case 222 :
+        case 222 :      // 启动更新
             var selectedRows = self.tableView.indexPathsForSelectedRows() as? [NSIndexPath] ?? [NSIndexPath]()
             if selectedRows.count != 0 {
                 updateWillStart(selectedRows)

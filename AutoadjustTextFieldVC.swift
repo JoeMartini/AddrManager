@@ -1,5 +1,5 @@
 //
-//  autoadjustTextFieldViewController.swift
+//  AutoadjustTextFieldVC.swift
 //  AddrManager
 //
 //  Created by Martini Wang on 14/10/27.
@@ -29,7 +29,6 @@ class AutoadjustTextFieldVC: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         // 借由NSNotification获取键盘事件信息
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)

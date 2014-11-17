@@ -1,5 +1,5 @@
 //
-//  FirstViewController.swift
+//  MyProfileViewController.swift
 //  AddrManager
 //
 //  Created by Martini Wang on 14/10/16.
@@ -17,7 +17,6 @@ class MyProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         myName.text = myProfile.name
         myZipcode.text = myProfile.address.zipcode

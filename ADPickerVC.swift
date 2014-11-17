@@ -1,5 +1,5 @@
 //
-//  subVCforADPickerView.swift
+//  ADPickerViewController.swift
 //  AddrManager
 //
 //  Created by Martini Wang on 14/10/27.
@@ -22,7 +22,6 @@ class ADPickerViewController: UIViewController, UIPickerViewDataSource, UIPicker
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         self.view.hidden = true
     }

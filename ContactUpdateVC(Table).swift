@@ -28,7 +28,6 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         tmpUpdateArray = buildUpdateProfileArray(updateIndex)
         
@@ -80,7 +79,6 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
 

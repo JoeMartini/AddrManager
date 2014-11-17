@@ -1,5 +1,5 @@
 //
-//  ContactDetailViewController.swift
+//  ContactProfileViewController.swift
 //  AddrManager
 //
 //  Created by Martini Wang on 14/10/27.
@@ -15,7 +15,6 @@ class ContactProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         // 加载信息
         var currentProfile:Profile = allProfiles[groupIndex].contacts[contactIndex]
@@ -77,7 +76,6 @@ class ContactProfileViewController: UIViewController {
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     

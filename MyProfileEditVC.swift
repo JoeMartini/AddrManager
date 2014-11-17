@@ -21,7 +21,6 @@ class MyProfileEditViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         // 选择框的委托设置
         let ADChinaPickerVC:ADPickerViewController = ADPickerViewController()
@@ -36,7 +35,6 @@ class MyProfileEditViewController: UIViewController {
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     /*

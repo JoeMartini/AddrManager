@@ -81,7 +81,7 @@ func getSysContacts() -> [Profile] {
         
         for contact in sysContacts {
             var currentContact:Profile = Profile()
-            
+            currentContact.resource = contactResource.systemAddressBook
             /*
             部分单值属性
             */
@@ -182,10 +182,10 @@ enum language {
 
 func languageDetectByFirstCharacter (str:String?) -> language {
     if str != nil && str != "" {
-        let SimplifiedChinese = 0x4E00 ... 0x9FFF
+        let CKJRange = 0x4E00 ... 0x9FFF    // 此区间为unicode的CKJ主要字符编码区间，只能笼统的识别中日韩文字
         for chr in str!.substringToIndex(advance(str!.startIndex, 1)).unicodeScalars {
             switch Int(chr.value) {
-            case let x where x >= SimplifiedChinese.startIndex && x <= SimplifiedChinese.endIndex :
+            case let x where x >= CKJRange.startIndex && x <= CKJRange.endIndex :
                 return language.Chinese
             default :
                 return language.Other

@@ -32,6 +32,22 @@ var myAddressAuthorizationList:[AddrAuthorization] = [AddrAuthorization(user: my
 
 // 0: Marked, 1: Default
 var allProfiles:[ContactsGroup] = [ContactsGroup(contacts: [myProfile,anyProfile], groupName: "Marked"),ContactsGroup(contacts: [Profile](), groupName: "Default")]
+func countNotEmptyContactsGroups (groups:[ContactsGroup]?) -> Int {
+    return (groupsIsNotEmpty(groups) ?? [ContactsGroup]())!.count
+}
+func groupsIsNotEmpty(groups:[ContactsGroup]?) -> [ContactsGroup]? {
+    var tmpGroup:Array = [ContactsGroup]()
+    if groups == nil {
+        return nil
+    }else{
+        for g in groups! {
+            if !g.isEmpty() {
+                tmpGroup.append(g)
+            }
+        }
+    }
+    return tmpGroup.count == 0 ? nil : tmpGroup
+}
 
 func markOrRevoke (indexPath:NSIndexPath) {
     var index:Int = indexPath.section == 0 ? 1 : 0

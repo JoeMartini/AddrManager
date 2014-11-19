@@ -8,11 +8,13 @@
 
 import UIKit
 
-class ContactlistTableViewController: UITableViewController, UIActionSheetDelegate, UIAlertViewDelegate, UISearchBarDelegate {
+class ContactlistTableViewController: UITableViewController, UIActionSheetDelegate, UIAlertViewDelegate, UISearchBarDelegate, UISearchDisplayDelegate {
     
     @IBOutlet weak var updateButton: UIBarButtonItem!
     
     var reuseAddBarButton:UIBarButtonItem = UIBarButtonItem()
+    var contactSearchResults:[NSIndexPath] = []
+    //var contactSearchReferences:[ContactReference] = [contactReference]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -20,7 +22,9 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         self.tableView.dataSource = self
         self.tableView.delegate = self
     }
+    
 
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
@@ -119,21 +123,126 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     }
     
     /*
+    Search, SearchBar, SearchDisplayController
+    */
+    func buildupSearchReferences (#searchText:String) {
+        
+        func appendIndexPathIfNecessary (indexPath:NSIndexPath) {
+            var alreadyAppended:Bool = false
+            for result in contactSearchResults {
+                alreadyAppended = result == indexPath
+            }
+            if !alreadyAppended {
+                contactSearchResults.append(indexPath)
+            }
+        }
+        
+        func searchKeyword (#contactIndex:NSIndexPath, #keyword:String) -> Bool {
+            enum searchCategory {
+                case zipcodeOnly
+                case nameOnly
+                case addressOnly
+                case nameAndAddress
+                case zipcodeAndAddress
+                case all
+            }
+            var SC:searchCategory
+            let contact:Profile = allProfiles[contactIndex.section].contactAtIndex(contactIndex.row)
+            
+            if keyword.toInt() != nil {    // 搜索内容为数字，此时搜索邮编即可（若位数较少可能为门牌号）
+                if countElements(keyword) == 6 {
+                    SC = .zipcodeOnly
+                }else{
+                    SC = .zipcodeAndAddress
+                }
+            }else if languageDetectByFirstCharacter(searchText) == .Chinese && countElements(searchText) > 5 {      // 搜索内容为中文且字数大于5，搜索地址即可
+                SC = .addressOnly
+            }else{      // 先搜索姓名，再搜索地址？
+                SC = .nameAndAddress
+            }
+            
+            switch SC {
+            case .zipcodeOnly :
+                return contact.address.zipcode.rangeOfString(keyword) != nil
+            case .zipcodeAndAddress :
+                return ( contact.address.zipcode.rangeOfString(keyword) != nil || contact.address.full.rangeOfString(keyword) != nil )
+            case .addressOnly :
+                return contact.address.full.rangeOfString(keyword, options:NSStringCompareOptions.CaseInsensitiveSearch) != nil
+            case .nameAndAddress :
+                return ( contact.name.rangeOfString(keyword, options:NSStringCompareOptions.CaseInsensitiveSearch) != nil || contact.address.full.rangeOfString(keyword, options:NSStringCompareOptions.CaseInsensitiveSearch) != nil )
+            default :
+                return ( contact.name.rangeOfString(keyword, options:NSStringCompareOptions.CaseInsensitiveSearch) != nil || contact.address.full.rangeOfString(keyword, options:NSStringCompareOptions.CaseInsensitiveSearch) != nil || contact.address.zipcode.rangeOfString(keyword) != nil )
+            }
+        }
+        
+        if searchText != "" {
+            contactSearchResults.removeAll(keepCapacity: false)
+            var keywords:[String] = searchText.componentsSeparatedByString(" ")
+            
+            for s in 0 ..< allProfiles.count {
+                for r in 0 ..< allProfiles[s].count() {
+                    var indexPath:NSIndexPath = NSIndexPath(forRow: r, inSection: s)
+                    var searchResult:Bool = true
+                    for keyword in keywords {
+                        if keyword != "" {
+                            searchResult = searchKeyword(contactIndex: indexPath, keyword: keyword) && searchResult
+                        }
+                    }
+                    if searchResult {
+                        appendIndexPathIfNecessary(indexPath)
+                    }
+                }
+            }
+        }
+    }
+    
+    func searchBarShouldBeginEditing(searchBar: UISearchBar) -> Bool {
+        searchBar.showsCancelButton = true
+        return true
+    }
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        println(searchText)
+        buildupSearchReferences(searchText: searchText)
+    }
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        println(searchBar.text)
+        buildupSearchReferences(searchText: searchBar.text)
+    }
+    func searchDisplayController(controller: UISearchDisplayController, didLoadSearchResultsTableView tableView: UITableView) {
+        tableView.rowHeight = 64
+    }
+    
+    /*
     TableView相关
     */
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return allProfiles.count
+        if tableView == self.searchDisplayController?.searchResultsTableView {
+            return 1
+        }else{
+            return allProfiles.count
+        }
     }
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if tableView == self.searchDisplayController?.searchResultsTableView {
+            return contactSearchResults.count
+        }
         return allProfiles[section].count()
     }
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return allProfiles[section].name
+        if tableView == self.searchDisplayController?.searchResultsTableView {
+            return nil
+        }
+        return allProfiles[section].count() == 0 ? nil : allProfiles[section].name
     }
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell:UITableViewCell =  self.tableView.dequeueReusableCellWithIdentifier("contactListCell") as UITableViewCell
-        cell.textLabel.text = allProfiles[indexPath.section].contactAtIndex(indexPath.row).name
-        cell.detailTextLabel?.text = allProfiles[indexPath.section].contactAtIndex(indexPath.row).address.full
+        if tableView == self.searchDisplayController?.searchResultsTableView {
+            cell.textLabel.text = allProfiles[contactSearchResults[indexPath.row].section].contactAtIndex(contactSearchResults[indexPath.row].row).name
+            cell.detailTextLabel?.text = allProfiles[contactSearchResults[indexPath.row].section].contactAtIndex(contactSearchResults[indexPath.row].row).address.full
+        }else{
+            cell.textLabel.text = allProfiles[indexPath.section].contactAtIndex(indexPath.row).name
+            cell.detailTextLabel?.text = allProfiles[indexPath.section].contactAtIndex(indexPath.row).address.full
+        }
         return cell
     }
     /*
@@ -147,8 +256,13 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
             updateButton.tag = 222
         }else{
             var contactProfileVC:ContactProfileViewController = ContactProfileViewController()
-            contactProfileVC.groupIndex = indexPath.section
-            contactProfileVC.contactIndex = indexPath.row
+            if tableView == self.searchDisplayController?.searchResultsTableView {
+                contactProfileVC.groupIndex = contactSearchResults[indexPath.row].section
+                contactProfileVC.contactIndex = contactSearchResults[indexPath.row].row
+            }else{
+                contactProfileVC.groupIndex = indexPath.section
+                contactProfileVC.contactIndex = indexPath.row
+            }
             self.navigationController?.pushViewController(contactProfileVC, animated: true)
         }
     }

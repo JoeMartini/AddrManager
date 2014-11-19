@@ -58,11 +58,19 @@ struct Profile {
 }
 
 func buildUserID() -> Int {
-    return "\(today.year)\(arc4random()%10)\(arc4random()%10)\(arc4random()%10)\(arc4random()%10)".toInt()!
+    return "\(today.year)\(randomInRange(0...9))\(randomInRange(0...9))\(randomInRange(0...9))\(randomInRange(0...9))".toInt()!
+}
+/*
+其实Swift的Int是和CPU架构有关的：在32位的CPU上（也就是iPhone5和前任们），实际上它是Int32，而在64位CPU(iPhone5s及以后的机型)上是Int64。arc4random所返回的值不论在什么平台上都是一个UInt32，于是在32位的平台上就有一半几率在进行Int转换时越界
+http://swifter.tips/random-number/
+*/
+func randomInRange(range: Range<Int>) -> Int {
+    let count = UInt32(range.endIndex - range.startIndex)
+    return  Int(arc4random_uniform(count)) + range.startIndex
 }
 
 enum contactResource:Int {
-    case systemContact
+    case systemAddressBook
     case manualAdded
     case fromWebSite
 }
@@ -102,7 +110,6 @@ struct ContactsGroup {
     mutating func addContactInGroup (contact:Profile) {
         self.contacts.append(contact)
     }
-    
     mutating func removeContactInGroup (contact:Profile) {
         for (index, currentContact) in enumerate(contacts) {
             if currentContact.userID == contact.userID {
@@ -110,7 +117,6 @@ struct ContactsGroup {
             }
         }
     }
-    
     mutating func removeContactAtIndex(index:Int) -> Profile? {
         if index > contacts.count {
             println("wrong index")
@@ -123,13 +129,18 @@ struct ContactsGroup {
     func contactAtIndex(index:Int) -> Profile {
         return self.contacts[index] as Profile
     }
-    
     func count() -> Int {
         return self.contacts.count
     }
+    func isEmpty() -> Bool {
+        return self.contacts.isEmpty
+    }
 }
 
-
+struct ContactReference {
+    var groupIndex:Int
+    var contactIndex:Int
+}
 
 
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="14B23" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="n4r-Fj-eSC">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="n4r-Fj-eSC">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
@@ -483,10 +483,13 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                        <searchBar key="tableHeaderView" contentMode="redraw" id="NXI-6F-NvE">
+                        <searchBar key="tableHeaderView" contentMode="redraw" id="nIW-f6-WEu">
                             <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                             <textInputTraits key="textInputTraits"/>
+                            <connections>
+                                <outlet property="delegate" destination="Wh1-eh-Gbu" id="IDv-av-amm"/>
+                            </connections>
                         </searchBar>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="contactListCell" textLabel="NxH-aE-RIk" detailTextLabel="bVG-97-HRW" rowHeight="64" style="IBUITableViewCellStyleSubtitle" id="xou-Id-MRg">
@@ -529,10 +532,20 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="searchDisplayController" destination="TQn-D6-Vzd" id="9BO-KR-B4w"/>
                         <outlet property="updateButton" destination="Nrg-4l-W0V" id="C31-hk-tm9"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="R8Z-j3-sQd" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="TQn-D6-Vzd">
+                    <connections>
+                        <outlet property="delegate" destination="Wh1-eh-Gbu" id="tr5-Nu-u4w"/>
+                        <outlet property="searchBar" destination="nIW-f6-WEu" id="iAc-Fz-xEr"/>
+                        <outlet property="searchContentsController" destination="Wh1-eh-Gbu" id="O0u-PG-S7h"/>
+                        <outlet property="searchResultsDataSource" destination="Wh1-eh-Gbu" id="0HF-ub-eHq"/>
+                        <outlet property="searchResultsDelegate" destination="Wh1-eh-Gbu" id="zGz-3o-8ST"/>
+                    </connections>
+                </searchDisplayController>
             </objects>
             <point key="canvasLocation" x="970" y="-376"/>
         </scene>

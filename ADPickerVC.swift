@@ -47,11 +47,11 @@ class ADPickerViewController: UIViewController, UIPickerViewDataSource, UIPicker
     func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String! {
         switch component {
         case 0 :
-            return ADInquiry(row, nil, nil)
+            return ADInquiry(row)
         case 1 :
-            return ADInquiry(pickerView.selectedRowInComponent(0), row, nil)
+            return ADInquiry(pickerView.selectedRowInComponent(0), cityIndex: row)
         case 2 :
-            return ADInquiry(pickerView.selectedRowInComponent(0), pickerView.selectedRowInComponent(1), row)
+            return ADInquiry(pickerView.selectedRowInComponent(0), cityIndex: pickerView.selectedRowInComponent(1), districtIndex: row)
         default :
             return "Error"
         }

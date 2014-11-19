@@ -51,9 +51,9 @@ struct Address {
         self.provinceIndex = provinceIndex
         self.cityIndex = cityIndex
         self.districtIndex = districtIndex
-        self.province = ADInquiry(provinceIndex, nil, nil)
-        self.city = ADInquiry(provinceIndex, cityIndex, nil)
-        self.district = ADInquiry(provinceIndex, cityIndex, districtIndex)
+        self.province = ADInquiry(provinceIndex)
+        self.city = ADInquiry(provinceIndex, cityIndex: cityIndex)
+        self.district = ADInquiry(provinceIndex, cityIndex: cityIndex, districtIndex: districtIndex)
         self.full = updateAddressDirectly([self.province!, self.city!, self.district!], street)
         self.zipcode = zipcodeInquiry(self.full)
         self.postcode = self.zipcode.toInt()
@@ -87,7 +87,7 @@ enum addrValidityPeriod:Int {
 
 // 地址更新
 func updateAddress (ADIndexs:[Int], street:String?) -> String {
-    var ADs:[String] = [ADInquiry(ADIndexs[0], nil, nil), ADInquiry(ADIndexs[0], ADIndexs[1], nil), ADInquiry(ADIndexs[0], ADIndexs[1], ADIndexs[2])]
+    var ADs:[String] = [ADInquiry(ADIndexs[0]), ADInquiry(ADIndexs[0], cityIndex: ADIndexs[1]), ADInquiry(ADIndexs[0], cityIndex: ADIndexs[1], districtIndex: ADIndexs[2])]
     return updateAddressDirectly(ADs, street)
 }
 func updateAddressDirectly (ADs:[String], street:String?) -> String {
@@ -116,18 +116,16 @@ php脚本抓取百度邮编搜索结果页面中的表格，输出第一页18个
 func zipcodeInquiry (address:String) -> String {
     if address != "" {
         // 服务器查询地址前缀
-        let prefix:NSString = NSString(string: "http://martini.wang/dev_resources/zipcode.php?addr=")
+        let prefix:String = "http://martini.wang/dev_resources/zipcode.php?addr="
         // NSURL不能处理中文，需要先转换为UTF－8
-        let nsAddr:NSString = NSString(string: address)
-        let nsstrURL:NSString = prefix + nsAddr
-        let nsURL:NSURL = NSURL(string: nsstrURL.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!)!
+        //let nsAddr:NSString = NSString(string: address)
+        let strURL:String = prefix + address
+        let nsURL:NSURL = NSURL(string: strURL.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!)!
         // 获取返回结果，并格式化
-        let resultNSData:NSData = NSData(contentsOfURL: nsURL)!
-        let resultJSON:AnyObject = NSJSONSerialization.JSONObjectWithData(resultNSData, options: NSJSONReadingOptions.AllowFragments, error: nil)!
+        let resultNSData:NSData? = NSData(contentsOfURL: nsURL)?
+        let resultJSON:AnyObject? = NSJSONSerialization.JSONObjectWithData(resultNSData ?? NSData(), options: NSJSONReadingOptions.AllowFragments, error: nil)
         // 直接将第一个结果转换为文本，但此结果可能为空，用可选型进行判断
-        var result:String? = resultJSON.firstObject as? String
-        // if result != nil { return result as String! } else { return "000000" }
-        // “nil 聚合运算符” 若result不为空，则返回result的解包，否则返回000000，代替上述条件语句
+        var result:String? = resultJSON?.firstObject as? String
         return result ?? "000000"
     }else{
         return "000000"
@@ -138,11 +136,11 @@ func zipcodeInquiry (address:String) -> String {
 行政区json数据解析部分
 */
 // 获取数据
-var ADChinaJsonNSData:NSData = NSData(contentsOfURL: NSURL(string: "http://martini.wang/dev_resources/ADChina.json")!)!
+let ADChinaJsonNSData:NSData? = NSData(contentsOfURL: NSURL(string: "http://martini.wang/dev_resources/ADChina.json")!)?
 //用SwiftJSON解析数据
-var ADChinaSwiftJSON = JSON(data: ADChinaJsonNSData, options: NSJSONReadingOptions.AllowFragments, error: nil)
+let ADChinaSwiftJSON:JSON = JSON(data: ADChinaJsonNSData ?? NSData(), options: NSJSONReadingOptions.AllowFragments, error: nil)
 // 行政区查询函数
-func ADInquiry (provinceIndex:Int, cityIndex:Int?, districtIndex:Int?) -> String {
+func ADInquiry (provinceIndex:Int, cityIndex:Int? = nil, districtIndex:Int? = nil) -> String {
     var AD:String = ""
     if cityIndex == nil {   // if city index is nil, district index should be nil, this inquiry has only province index
         return ADChinaSwiftJSON["result"][provinceIndex]["province"].stringValue

@@ -15,19 +15,14 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var userIDInputTextField: UITextField!
     @IBOutlet weak var passwordInputTextField: UITextField!
-    @IBOutlet weak var contactImprotingIndicator: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         autoTFDelegate([userIDInputTextField, passwordInputTextField], self)
-        
-        println("\(today.year)\(today.month)\(today.day)")
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     @IBAction func userIDInputFinished(sender: AnyObject) {
@@ -51,17 +46,15 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
     
     // 暂时用按钮触发通讯录导入
     @IBAction func importContactButton(sender: AnyObject) {
-        //contactImprotingIndicator.hidden = false
-        contactImprotingIndicator.startAnimating()
-        println(contactImprotingIndicator.isAnimating())
         var sysContacts:Array = getSysContacts()
         for sysContact in sysContacts {
             // 只导入系统通讯录中有地址的联系人
             if sysContact.address.full != "" {
-                allProfiles[1].addContactInGroup(sysContact)//defaultContactGroup.addContactInGroup(sysContact)
+                saveContactsInGroupIntoCoreData(sysContact)
+                //allProfiles[1].addContactInGroup(sysContact)//defaultContactGroup.addContactInGroup(sysContact)
             }
         }
-        contactImprotingIndicator.stopAnimating()
+        println("import finished")
     }
     // 定位成功
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {

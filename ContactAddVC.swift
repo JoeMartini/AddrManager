@@ -35,10 +35,6 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
         
         // 输入框委托设置
         autoTFDelegate([nameTextField,addrdetailTextField,provinceTextField,cityTextField,districtTextField], self)
-        
-        // 加载一段测试——添加用户
-        test(nameTextField, "测试员", nil)
-        test(addrdetailTextField, "泉城路77号", nil)
     }
     
     override func didReceiveMemoryWarning() {
@@ -59,7 +55,7 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
             if addrdetailTextField.text == "" {
                 println("Error,no address detail")
             }
-            allProfiles[1].addContactInGroup(Profile(name: nameTextField.text, address: Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)))
+            saveContactsInGroupIntoCoreData(Profile(name: nameTextField.text, address: Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)))
         case "contactAddCancel" :
             break
         default :

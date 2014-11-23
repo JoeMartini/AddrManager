@@ -12,7 +12,7 @@ class ContactProfileViewController: UIViewController {
     
     var groupIndex:Int = 0
     var contactIndex:Int = 0    //联系人索引值
-    var currentProfile:Profile = Profile()
+    var currentProfile:ProfileSaved = ProfileSaved()
     
     var nameLabel:UILabel = UILabel()
     var zipcodeLabel:UILabel = UILabel()
@@ -69,7 +69,7 @@ class ContactProfileViewController: UIViewController {
         addressTextView.bounces = true
         addressTextView.dataDetectorTypes = UIDataDetectorTypes.Address
         
-        display(groupIndex, contactIndex: contactIndex)
+        displayByIndex(groupIndex, contactIndex: contactIndex)
         
         // 显示界面
         self.view.addSubview(nameLabel)
@@ -85,7 +85,7 @@ class ContactProfileViewController: UIViewController {
     
     func showNext (sender:AnyObject?) {
         
-        if contactIndex == allProfiles[groupIndex].count()-1 {
+        if contactIndex == contactsGroups[groupIndex].count()-1 {
             if groupIndex == countNotEmptyContactsGroups(allProfiles)-1 {
                 println("Last contact")
             }else{
@@ -95,7 +95,7 @@ class ContactProfileViewController: UIViewController {
         }else{
             contactIndex += 1
         }
-        display(groupIndex, contactIndex: contactIndex)
+        displayByIndex(groupIndex, contactIndex: contactIndex)
     }
     func showBefore (sender:AnyObject?) {
         
@@ -104,15 +104,18 @@ class ContactProfileViewController: UIViewController {
                 println("First contact")
             }else{
                 groupIndex -= 1
-                contactIndex = allProfiles[groupIndex].count() - 1
+                contactIndex = contactsGroups[groupIndex].count() - 1
             }
         }else{
             contactIndex -= 1
         }
-        display(groupIndex, contactIndex: contactIndex)
+        displayByIndex(groupIndex, contactIndex: contactIndex)
     }
-    func display (groupIndex:Int, contactIndex:Int) {
-        currentProfile = allProfiles[groupIndex].contacts[contactIndex]
+    func displayByUserID (userID:String) {
+        currentProfile = loadContactByUserID(userID)!
+    }
+    func displayByIndex (groupIndex:Int, contactIndex:Int) {
+        currentProfile = loadContactsByGroup(contactsGroups[groupIndex])?[contactIndex]!
         nameLabel.text = currentProfile.name
         zipcodeTextView.text = currentProfile.address.zipcode
         addressTextView.text = currentProfile.address.full

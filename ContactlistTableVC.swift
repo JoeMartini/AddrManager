@@ -13,8 +13,8 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     @IBOutlet weak var updateButton: UIBarButtonItem!
     
     var reuseAddBarButton:UIBarButtonItem = UIBarButtonItem()
-    var contactSearchResults:[NSIndexPath] = []
-    //var contactSearchReferences:[ContactReference] = [contactReference]()
+    var contactsList:[ProfileSaved:NSIndexPath] = [ProfileSaved:NSIndexPath]()
+    var contactSearchResults:[ProfileSaved] = [ProfileSaved]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,8 +22,6 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         self.tableView.dataSource = self
         self.tableView.delegate = self
     }
-    
-
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -39,8 +37,8 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         switch updateButton.tag {
         case 111 :      // 全选
             updateButton.title = "Done"
-            for s in 0 ..< allProfiles.count {
-                for r in 0 ..< allProfiles[s].count() {
+            for s in 0 ..< contactsGroups.count {
+                for r in 0 ..< contactsGroups[s].count() {
                     var indexPath:NSIndexPath = NSIndexPath(forRow: r, inSection: s)
                     self.tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: UITableViewScrollPosition.None)
                 }
@@ -106,7 +104,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     func updateWillStart (indexPathsToUpdate:[NSIndexPath]?) {
         var contactUpdateViewController:ContactUpdateViewController = ContactUpdateViewController()
         var navControllerToUpdateView:UINavigationController = UINavigationController(rootViewController: contactUpdateViewController)
-        contactUpdateViewController.updateIndex = buildContactUpdateIndexArray(indexPathsToUpdate)
+        contactUpdateViewController.updateIndex = indexPathsToUpdate ?? //buildContactUpdateIndexArray(indexPathsToUpdate)
         self.presentViewController(navControllerToUpdateView, animated: true, completion: nil)
     }
     
@@ -125,74 +123,55 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     /*
     Search, SearchBar, SearchDisplayController
     */
-    func buildupSearchReferences (#searchText:String) {
-        
-        func appendIndexPathIfNecessary (indexPath:NSIndexPath) {
-            var alreadyAppended:Bool = false
-            for result in contactSearchResults {
-                alreadyAppended = result == indexPath
-            }
-            if !alreadyAppended {
-                contactSearchResults.append(indexPath)
-            }
-        }
-        
-        func searchKeyword (#contactIndex:NSIndexPath, #keyword:String) -> Bool {
-            enum searchCategory {
-                case zipcodeOnly
-                case nameOnly
-                case addressOnly
-                case nameAndAddress
-                case zipcodeAndAddress
-                case all
-            }
-            var SC:searchCategory
-            let contact:Profile = allProfiles[contactIndex.section].contactAtIndex(contactIndex.row)
-            
-            if keyword.toInt() != nil {    // 搜索内容为数字，此时搜索邮编即可（若位数较少可能为门牌号）
-                if countElements(keyword) == 6 {
-                    SC = .zipcodeOnly
-                }else{
-                    SC = .zipcodeAndAddress
-                }
-            }else if languageDetectByFirstCharacter(searchText) == .Chinese && countElements(searchText) > 5 {      // 搜索内容为中文且字数大于5，搜索地址即可
-                SC = .addressOnly
-            }else{      // 先搜索姓名，再搜索地址？
-                SC = .nameAndAddress
-            }
-            
-            switch SC {
-            case .zipcodeOnly :
-                return contact.address.zipcode.rangeOfString(keyword) != nil
-            case .zipcodeAndAddress :
-                return ( contact.address.zipcode.rangeOfString(keyword) != nil || contact.address.full.rangeOfString(keyword) != nil )
-            case .addressOnly :
-                return contact.address.full.rangeOfString(keyword, options:NSStringCompareOptions.CaseInsensitiveSearch) != nil
-            case .nameAndAddress :
-                return ( contact.name.rangeOfString(keyword, options:NSStringCompareOptions.CaseInsensitiveSearch) != nil || contact.address.full.rangeOfString(keyword, options:NSStringCompareOptions.CaseInsensitiveSearch) != nil )
-            default :
-                return ( contact.name.rangeOfString(keyword, options:NSStringCompareOptions.CaseInsensitiveSearch) != nil || contact.address.full.rangeOfString(keyword, options:NSStringCompareOptions.CaseInsensitiveSearch) != nil || contact.address.zipcode.rangeOfString(keyword) != nil )
-            }
+    func search (#searchText:String) {
+        enum searchCategory {
+            case zipcodeOnly
+            case nameOnly
+            case addressOnly
+            case nameAndAddress
+            case zipcodeAndAddress
+            case all
         }
         
         if searchText != "" {
             contactSearchResults.removeAll(keepCapacity: false)
             var keywords:[String] = searchText.componentsSeparatedByString(" ")
-            
-            for s in 0 ..< allProfiles.count {
-                for r in 0 ..< allProfiles[s].count() {
-                    var indexPath:NSIndexPath = NSIndexPath(forRow: r, inSection: s)
-                    var searchResult:Bool = true
-                    for keyword in keywords {
-                        if keyword != "" {
-                            searchResult = searchKeyword(contactIndex: indexPath, keyword: keyword) && searchResult
+            var predicates:[NSPredicate] = [NSPredicate]()
+            for keyword in keywords {
+                if keyword != "" {
+                    
+                    var SC:searchCategory
+                    
+                    if keyword.toInt() != nil {    // 搜索内容为数字，此时搜索邮编即可（若位数较少可能为门牌号）
+                        if countElements(keyword) == 6 {
+                            SC = .zipcodeOnly
+                        }else{
+                            SC = .zipcodeAndAddress
                         }
+                    }else if languageDetectByFirstCharacter(keyword) == .Chinese && countElements(searchText) > 5 {      // 搜索内容为中文且字数大于5，搜索地址即可
+                        SC = .addressOnly
+                    }else{      // 先搜索姓名，再搜索地址？
+                        SC = .nameAndAddress
                     }
-                    if searchResult {
-                        appendIndexPathIfNecessary(indexPath)
+                    
+                    switch SC {
+                    case .zipcodeOnly :
+                        predicates.append(NSPredicate(format: "address.zipcode LIKE[cd] %@", keyword)!)
+                    case .zipcodeAndAddress :
+                        predicates.append(NSPredicate(format: "(address.full LIKE[cd] %@) OR (address.zipcode LIKE[cd] %@)", keyword, keyword)!)
+                    case .addressOnly :
+                        predicates.append(NSPredicate(format: "address.full LIKE[cd] %@", keyword)!)
+                    case .nameAndAddress :
+                        predicates.append(NSPredicate(format: "(name CONTAINS[cd] %@) OR (address.full LIKE[cd] %@)", keyword, keyword)!)
+                    default :
+                        predicates.append(NSPredicate(format: "(name CONTAINS[cd] %@) OR (address.full LIKE[cd] %@) OR (address.zipcode LIKE[cd] %@)", keyword, keyword, keyword)!)
                     }
                 }
             }
+            let compoundPredicate:NSCompoundPredicate = NSPrediacate(type: .AndPredicateType, subpredicates: predicates)
+            contactSearchResults = loadContactsByPredicate(compoundPredicate) ?? [ProfileSaved]()
+        }else{
+            contactSearchResults = [ProfileSaved]()
         }
     }
     
@@ -202,11 +181,11 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     }
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
         println(searchText)
-        buildupSearchReferences(searchText: searchText)
+        search(searchText: searchText)
     }
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         println(searchBar.text)
-        buildupSearchReferences(searchText: searchBar.text)
+        search(searchText: searchBar.text)
     }
     func searchDisplayController(controller: UISearchDisplayController, didLoadSearchResultsTableView tableView: UITableView) {
         tableView.rowHeight = 64
@@ -219,29 +198,31 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         if tableView == self.searchDisplayController?.searchResultsTableView {
             return 1
         }else{
-            return allProfiles.count
+            return contactsGroups.count
         }
     }
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == self.searchDisplayController?.searchResultsTableView {
             return contactSearchResults.count
         }
-        return allProfiles[section].count()
+        return contactsGroups[section].count()
     }
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if tableView == self.searchDisplayController?.searchResultsTableView {
             return nil
         }
-        return allProfiles[section].count() == 0 ? nil : allProfiles[section].name
+        return contactsGroups[section].count() == 0 ? nil : contactsGroups[section].name
     }
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell:UITableViewCell =  self.tableView.dequeueReusableCellWithIdentifier("contactListCell") as UITableViewCell
         if tableView == self.searchDisplayController?.searchResultsTableView {
-            cell.textLabel.text = allProfiles[contactSearchResults[indexPath.row].section].contactAtIndex(contactSearchResults[indexPath.row].row).name
-            cell.detailTextLabel?.text = allProfiles[contactSearchResults[indexPath.row].section].contactAtIndex(contactSearchResults[indexPath.row].row).address.full
+            cell.textLabel.text = contactSearchResults[indexPath.row].name
+            cell.detailTextLabel?.text = contactSearchResults[indexPath.row].address.full
         }else{
-            cell.textLabel.text = allProfiles[indexPath.section].contactAtIndex(indexPath.row).name
-            cell.detailTextLabel?.text = allProfiles[indexPath.section].contactAtIndex(indexPath.row).address.full
+            let thisContact:ProfileSaved = loadContactsGroups(contactsGroups[indexPath.section])?[indexPath.row] ?? ProfileSaved()
+            contactsList[thisContact] = indexPath
+            cell.textLabel.text = thisContact.name
+            cell.detailTextLabel?.text = thisContact.address.full
         }
         return cell
     }
@@ -257,8 +238,8 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         }else{
             var contactProfileVC:ContactProfileViewController = ContactProfileViewController()
             if tableView == self.searchDisplayController?.searchResultsTableView {
-                contactProfileVC.groupIndex = contactSearchResults[indexPath.row].section
-                contactProfileVC.contactIndex = contactSearchResults[indexPath.row].row
+                contactProfileVC.groupIndex = contactsList[contactSearchResults[indexPath.row]].section
+                contactProfileVC.contactIndex = contactsList[contactSearchResults[indexPath.row]].row
             }else{
                 contactProfileVC.groupIndex = indexPath.section
                 contactProfileVC.contactIndex = indexPath.row
@@ -295,7 +276,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
             markAction.backgroundColor = UIColor.orangeColor()
             
             var deleteAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Delete") { (action, indexPath) -> Void in
-                allProfiles[indexPath.section].removeContactAtIndex(indexPath.row)
+                contactsGroups[indexPath.section].removeContactAtIndex(indexPath.row)
                 self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
             }
             

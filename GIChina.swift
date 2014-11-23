@@ -23,10 +23,10 @@ struct Address {
     var full:String
     
     var zipcode:String
-    var postcode:Int?
+    //var postcode:Int?
     
     var buildTime:Date?
-    var validityPeriod:addrValidityPeriod?
+    var validityPeriod:String?
     
     init () {
         self.full = ""
@@ -39,7 +39,6 @@ struct Address {
         self.district = district
         self.full = updateAddressDirectly([province ?? "", city ?? "", district ?? ""], street)
         self.zipcode = zipcodeInquiry(self.full)
-        self.postcode = self.zipcode.toInt()
     }
     
     init (province:String?, city:String?, district:String?, street:String?, identifier:String) {
@@ -56,7 +55,6 @@ struct Address {
         self.district = ADInquiry(provinceIndex, cityIndex: cityIndex, districtIndex: districtIndex)
         self.full = updateAddressDirectly([self.province!, self.city!, self.district!], street)
         self.zipcode = zipcodeInquiry(self.full)
-        self.postcode = self.zipcode.toInt()
     }
     
     init (provinceIndex:Int, cityIndex:Int, districtIndex:Int, street:String?, identifier:String) {
@@ -67,7 +65,6 @@ struct Address {
     init (fullAddress:String) {
         self.full = fullAddress
         self.zipcode = zipcodeInquiry(self.full)
-        self.postcode = self.zipcode.toInt()
     }
     
     init (fullAddress:String, identifier:String) {
@@ -75,8 +72,8 @@ struct Address {
         self.identifier = identifier
     }
 }
-
-enum addrValidityPeriod:Int {
+/*
+enum addrValidityPeriod:String {
     case forever
     case oneMonth
     case threeMonths
@@ -84,9 +81,9 @@ enum addrValidityPeriod:Int {
     case oneYear
     case fourYears
 }
-
+*/
 // 地址更新
-func updateAddress (ADIndexs:[Int], street:String?) -> String {
+func updateAddress (ADIndexs:[Int], street:String? = nil) -> String {
     var ADs:[String] = [ADInquiry(ADIndexs[0]), ADInquiry(ADIndexs[0], cityIndex: ADIndexs[1]), ADInquiry(ADIndexs[0], cityIndex: ADIndexs[1], districtIndex: ADIndexs[2])]
     return updateAddressDirectly(ADs, street)
 }
@@ -114,24 +111,51 @@ php脚本抓取百度邮编搜索结果页面中的表格，输出第一页18个
 4. 未做错误处理
 */
 func zipcodeInquiry (address:String) -> String {
-    if address != "" {
+    func inquiry(address:String) -> String? {
         // 服务器查询地址前缀
         let prefix:String = "http://martini.wang/dev_resources/zipcode.php?addr="
-        // NSURL不能处理中文，需要先转换为UTF－8
-        //let nsAddr:NSString = NSString(string: address)
         let strURL:String = prefix + address
         let nsURL:NSURL = NSURL(string: strURL.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding)!)!
         // 获取返回结果，并格式化
         let resultNSData:NSData? = NSData(contentsOfURL: nsURL)?
         let resultJSON:AnyObject? = NSJSONSerialization.JSONObjectWithData(resultNSData ?? NSData(), options: NSJSONReadingOptions.AllowFragments, error: nil)
-        // 直接将第一个结果转换为文本，但此结果可能为空，用可选型进行判断
-        var result:String? = resultJSON?.firstObject as? String
-        return result ?? "000000"
+        return resultJSON?.firstObject as? String
+    }
+    
+    if address != "" && languageDetectByFirstCharacter(address) == .Chinese {
+        if let result = inquiry(address) {
+            return result
+        }else{
+            if let ADs = ADsInFullAddress(address) {
+                let ADAddr = updateAddressDirectly([ADInquiry(ADs.provinceIndex, cityIndex: ADs.cityIndex, districtIndex: ADs.districtIndex)], nil)
+                return inquiry(ADAddr) ?? "000000"
+            }else{
+                return "000000"
+            }
+        }
     }else{
         return "000000"
     }
 }
 
+func ADsInFullAddress (address:String) -> (provinceIndex:Int, cityIndex:Int?, districtIndex:Int?)? {
+    for p in 0 ..< ADChinaSwiftJSON["result"].count {
+        if address.rangeOfString(ADInquiry(p).substringToIndex(advance(ADInquiry(p).startIndex, 2))) != nil {
+            for c in 0 ..< ADChinaSwiftJSON["result"][p]["city"].count {
+                if address.rangeOfString(ADInquiry(p, cityIndex:c).substringToIndex(advance(ADInquiry(p).startIndex, 2))) != nil {
+                    for d in 0 ..< ADChinaSwiftJSON["result"][p]["city"][c]["district"].count {
+                        if address.rangeOfString(ADInquiry(p, cityIndex:c, districtIndex:d).substringToIndex(advance(ADInquiry(p).startIndex, 2))) != nil {
+                            return (p,c,d)
+                        }
+                    }
+                    return (p,c,nil)
+                }
+            }
+            return (p,nil,nil)
+        }
+    }
+    return nil
+}
 /*
 行政区json数据解析部分
 */

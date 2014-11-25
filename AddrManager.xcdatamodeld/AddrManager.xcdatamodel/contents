@@ -27,9 +27,21 @@
         <relationship name="allAddresses" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AddressSaved" inverseName="belongsTo" inverseEntity="AddressSaved" syncable="YES"/>
         <relationship name="inGroup" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ContactsGroupSaved" inverseName="contacts" inverseEntity="ContactsGroupSaved" syncable="YES"/>
     </entity>
+    <entity name="UserAuthorization" representedClassName="AddrManager.UserAuthorization" syncable="YES">
+        <attribute name="authorization" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="limitTime" optional="YES" attributeType="Date" syncable="YES"/>
+        <relationship name="profile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProfileSaved" syncable="YES"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserInfo" inverseName="authorization" inverseEntity="UserInfo" syncable="YES"/>
+    </entity>
+    <entity name="UserInfo" representedClassName="AddrManager.UserInfo" syncable="YES">
+        <relationship name="authorization" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserAuthorization" inverseName="user" inverseEntity="UserAuthorization" syncable="YES"/>
+        <relationship name="profile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProfileSaved" syncable="YES"/>
+    </entity>
     <elements>
-        <element name="AddressSaved" positionX="-83" positionY="53" width="128" height="223"/>
-        <element name="ContactsGroupSaved" positionX="342" positionY="108" width="128" height="73"/>
-        <element name="ProfileSaved" positionX="144" positionY="81" width="128" height="148"/>
+        <element name="AddressSaved" positionX="-74" positionY="74" width="146" height="223"/>
+        <element name="ContactsGroupSaved" positionX="360" positionY="288" width="144" height="73"/>
+        <element name="ProfileSaved" positionX="144" positionY="135" width="144" height="148"/>
+        <element name="UserInfo" positionX="574" positionY="144" width="146" height="73"/>
+        <element name="UserAuthorization" positionX="360" positionY="-0" width="144" height="103"/>
     </elements>
 </model>

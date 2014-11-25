@@ -17,6 +17,6 @@ class ProfileSaved: NSManagedObject {
     @NSManaged var userID: String
     @NSManaged var address: AddressSaved
     @NSManaged var allAddresses: NSSet
-    @NSManaged var inGroup: ContactsGroupSaved
+    @NSManaged var inGroup: ContactsGroupSaved?
 
 }

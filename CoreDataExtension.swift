@@ -9,8 +9,6 @@
 import UIKit
 import CoreData
 
-var contactsGroups:[ContactsGroupSaved] = loadContactsGroups() ?? [ContactsGroupSaved]()
-
 // MOC
 var managedObjectContext: NSManagedObjectContext? = (UIApplication.sharedApplication().delegate as AppDelegate).managedObjectContext
 
@@ -24,13 +22,13 @@ extension ContactsGroupSaved {
 }
 
 // 读取所有用户群租，用于建立列表等
-func loadContactsGroups (MOC:NSManagedObjectContext = managedObjectContext!) -> [ContactsGroupSaved]? {
+func loadContactsGroups (MOC:NSManagedObjectContext = managedObjectContext!) -> [ContactsGroupSaved] {
     let groupRequest:NSFetchRequest = NSFetchRequest(entityName: "ContactsGroupSaved")
     groupRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: false)]        // name倒序排列[Marked,Default]
     if let groupResult = MOC.executeFetchRequest(groupRequest, error: nil) as? [ContactsGroupSaved] {
-        return groupResult.count > 0 ? groupResult : nil
+        return groupResult.count > 0 ? groupResult : [ContactsGroupSaved]()
     }else{
-        return nil
+        return [ContactsGroupSaved]()
     }
 }
 
@@ -60,28 +58,34 @@ func loadContactsByPredicateWithSort (predicate:NSPredicate, sortBy sortDescript
 }
 
 // 读取某用户组中所有用户，默认按照姓名排序
-func loadContactsByGroup (contactsGroup:ContactsGroupSaved, sortBy sortKey:String = "name", ascending:Bool = true, MOC:NSManagedObjectContext = managedObjectContext!) -> [ProfileSaved]? {
+func loadContactsByGroup (contactsGroup:ContactsGroupSaved, sortBy sortKey:String = "name", ascending:Bool = true) -> [ProfileSaved]? {
     let contactPrediacte:NSPredicate = NSPredicate(format: "inGroup = %@", contactsGroup)!
     let sortDescriptor = NSSortDescriptor(key: sortKey, ascending: ascending)
-    return loadContactsByPredicateWithSort(contactPrediacte,sortBy:sortDescriptor)
-}
-
-// 根据ID查找用户
-func loadContactByUserID (userID:String) -> ProfileSaved? {
-    let idPredicate = NSPredicate(format: "userID == %@", userID)
-    
-    if let contactFetchResult = loadContactsByPredicateWithSort(idPredicate!) {
-        return contactFetchResult.count > 0 ? contactFetchResult[0] : nil
+    if let contacts = loadContactsByPredicateWithSort(contactPrediacte,sortBy:sortDescriptor) {
+        return  contacts.count != 0 ? contacts : nil
     }else{
         return nil
     }
 }
 
-// 保存一个联系人到某组
-func saveContactsInGroupIntoCoreData (contact:Profile, MOC:NSManagedObjectContext = managedObjectContext!, groupToSaveIn groupName:String = "Default") -> Bool {
-    
+// 根据索引读取用户
+func loadContactByIndexPath (indexPath:NSIndexPath) -> ProfileSaved? {
+    let groupIndex = indexPath.section
+    let contactIndex = indexPath.row
+    if loadContactsGroups().count > groupIndex {
+        if let contacts = loadContactsByGroup(loadContactsGroups()[groupIndex]) {
+            return contacts.count > contactIndex ? contacts[contactIndex] : nil
+        }else{
+            return nil
+        }
+    }else{
+        return nil
+    }
+}
+
+func saveContactWithProfile (contact:Profile, MOC:NSManagedObjectContext = managedObjectContext!) -> ProfileSaved {
     // 存储 address 并设定归属
-    func saveAddressForContactIntoCoreData (address:Address,contact:ProfileSaved?) -> AddressSaved {//, contact:ProfileSaved?
+    func saveAddressForContactIntoCoreData (address:Address,contact:ProfileSaved?, MOC:NSManagedObjectContext = managedObjectContext!) -> AddressSaved {//, contact:ProfileSaved?
         let addressToSave = NSEntityDescription.insertNewObjectForEntityForName("AddressSaved", inManagedObjectContext: MOC) as AddressSaved
         
         addressToSave.setValuesForKeysWithDictionary([
@@ -126,35 +130,94 @@ func saveContactsInGroupIntoCoreData (contact:Profile, MOC:NSManagedObjectContex
         }
     }
     
-    contactToSave.inGroup = loadContactsGroupByName(groupName)
-    //loadContactsGroupByName(groupName).mutableSetValueForKey("contacts").addObject(contactToSave)
+    MOC.save(nil)
+    return contactToSave
+}
+// 保存一个联系人到某组
+func saveContactsInGroupIntoCoreData (contact:Profile, groupToSaveIn groupName:String = "Default", MOC:NSManagedObjectContext = managedObjectContext!) -> Bool {
+    saveContactWithProfile(contact).inGroup = loadContactsGroupByName(groupName)
+    return MOC.save(nil)
+}
+
+// 从群组中移除联系人，默认不删除联系人纪录及其地址
+func removeContactFromGroup (contactToRemove:ProfileSaved?, deleteContactWithAddresses delete:Bool = false, MOC:NSManagedObjectContext = managedObjectContext!) -> Bool {
+    if let contact = contactToRemove {
+        switch delete {
+        case true :     // 彻底删除
+            MOC.deleteObject(contact.address)
+            for address in contact.allAddresses {
+                MOC.deleteObject(address as NSManagedObject)
+            }
+            MOC.deleteObject(contact)
+        default :       // 从组中删除
+            if let contactGroup = contact.inGroup {
+                contactGroup.mutableSetValueForKey("contacts").removeObject(contact)
+            }
+        }
+    }
     
     return MOC.save(nil)
 }
 
-func buildContactIfNotExist (userID:String, MOC:NSManagedObjectContext = managedObjectContext!) -> ProfileSaved {
-    if let contactFetchResult = loadContactByUserID (userID) {
+// 更改分组
+func markOrRevoke (indexPath:NSIndexPath, MOC:NSManagedObjectContext = managedObjectContext!) -> Bool {
+    if let contact = loadContactByIndexPath(indexPath) {
+        if contact.inGroup == loadContactsGroupByName("Marked") {
+            contact.inGroup = loadContactsGroupByName("Default")
+        }else{
+            contact.inGroup = loadContactsGroupByName("Marked")
+        }
+    }
+    return MOC.save(nil)
+}
+
+// 用户详情页面中初始属性
+func buildContactIfNotExist (contact:ProfileSaved?, MOC:NSManagedObjectContext = managedObjectContext!) -> ProfileSaved {
+    if let contactFetchResult = contact {
         return contactFetchResult
     }else{
         return NSEntityDescription.insertNewObjectForEntityForName("ProfileSaved", inManagedObjectContext: MOC) as ProfileSaved
     }
 }
 
-
-// 从群组中移除联系人，默认不删除联系人纪录及其地址
-func removeContactFromGroup (contactToRemove:ProfileSaved, deleteContactWithAddresses delete:Bool = false, MOC:NSManagedObjectContext = managedObjectContext!) -> Bool {
-    switch delete {
-    case true :     // 彻底删除
-        MOC.deleteObject(contactToRemove.address)
-        for address in contactToRemove.allAddresses {
-            MOC.deleteObject(address as NSManagedObject)
-        }
-        MOC.deleteObject(contactToRemove)
-    default :       // 从组中删除
-        contactToRemove.inGroup.mutableSetValueForKey("contacts").removeObject(contactToRemove)
-        //contactToRemove.inGroup = nil
-    }
-    println(contactToRemove.description)
+// userInfo
+func setUserInfoWithProfile (contact:Profile, MOC:NSManagedObjectContext = managedObjectContext!) -> Bool {
+    var user = loadUserInfo()
+    user.profile = saveContactWithProfile(contact)
     return MOC.save(nil)
-
 }
+
+func loadUserInfo (MOC:NSManagedObjectContext = managedObjectContext!) -> UserInfo {
+    let userFetchRequest = NSFetchRequest(entityName: "UserInfo")
+    if let userFetchResults = MOC.executeFetchRequest(userFetchRequest, error: nil) as? [UserInfo] {
+        return userFetchResults.count > 0 ? userFetchResults[0] : buildUpUserInfo()
+    }else{
+        return buildUpUserInfo()
+    }
+}
+
+func buildUpUserInfo (MOC:NSManagedObjectContext = managedObjectContext!) -> UserInfo {
+    let newUserInfo = NSEntityDescription.insertNewObjectForEntityForName("UserInfo", inManagedObjectContext: MOC) as UserInfo
+    return newUserInfo
+}
+/*
+// 根据ID查找用户
+func loadContactByUserID (userID:String) -> ProfileSaved? {
+let idPredicate = NSPredicate(format: "userID == %@", userID)
+
+if let contactFetchResult = loadContactsByPredicateWithSort(idPredicate!) {
+return contactFetchResult.count > 0 ? contactFetchResult[0] : nil
+}else{
+return nil
+}
+}
+*/
+/*
+var managedObjectContext: NSManagedObjectContext? = {
+let delegater = UIApplication.sharedApplication().delegate as AppDelegate
+if let context = delegater.managedObjectContext {
+return context as NSManagedObjectContext
+}else{
+return nil
+}
+}()*/

@@ -110,7 +110,7 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "updateListCell")
-        cell.textLabel.text = loadContactsByGroup(contactsGroups[updateIndex[indexPath.row].section])?[updateIndex[indexPath.row].row].name
+        cell.textLabel.text = (loadContactByIndexPath(updateIndex[indexPath.row]) ?? ProfileSaved()).name//loadContactsByGroup(contactsGroups[updateIndex[indexPath.row].section])?[updateIndex[indexPath.row].row].name
         return cell
     }
     /*

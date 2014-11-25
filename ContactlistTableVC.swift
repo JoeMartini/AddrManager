@@ -13,11 +13,16 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     @IBOutlet weak var updateButton: UIBarButtonItem!
     
     var reuseAddBarButton:UIBarButtonItem = UIBarButtonItem()
-    var contactsList:[ProfileSaved:NSIndexPath] = [ProfileSaved:NSIndexPath]()
+    var contactsList:[ProfileSaved:NSIndexPath] = [ProfileSaved:NSIndexPath]()      // userID:indexpath
     var contactSearchResults:[ProfileSaved] = [ProfileSaved]()
     
     override func viewDidLoad() {
+        
+        getAllIndexPaths()
+        
         super.viewDidLoad()
+        
+        self.navigationController?.title = "Contacts"
         
         self.tableView.dataSource = self
         self.tableView.delegate = self
@@ -25,6 +30,18 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
+    }
+    
+    // 由于tableview不能直接获取所有NSIndexPath，通过二重循环生成所有NSIP
+    func getAllIndexPaths () {
+        for s in 0 ..< loadContactsGroups().count {
+            for r in 0 ..< loadContactsGroups()[s].count() {
+                let indexPath = NSIndexPath(forRow: r, inSection: s)
+                if let thisContact:ProfileSaved = loadContactByIndexPath(indexPath) {
+                    contactsList[thisContact] = indexPath
+                }
+            }
+        }
     }
     
     /*
@@ -37,11 +54,8 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         switch updateButton.tag {
         case 111 :      // 全选
             updateButton.title = "Done"
-            for s in 0 ..< contactsGroups.count {
-                for r in 0 ..< contactsGroups[s].count() {
-                    var indexPath:NSIndexPath = NSIndexPath(forRow: r, inSection: s)
-                    self.tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: UITableViewScrollPosition.None)
-                }
+            for indexPath in contactsList.values {//getAllIndexPaths() {
+                self.tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: UITableViewScrollPosition.None)
             }
             updateButton.tag = 222
         case 222 :      // 启动更新
@@ -53,50 +67,45 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
                 }
                 updateButton.tag = 0
                 updateCancel(nil)
-            }else{
-                let noSelectionWarning = UIAlertView(title: "No contact selected", message: "Would you like keep selecting or stop this select", delegate: self, cancelButtonTitle: "Cancel", otherButtonTitles: "Continue")
-                noSelectionWarning.show()
+            }else{      // 0选中，弹窗提示
+                let nonSelectionAlert = UIAlertController(title: "No contact selected", message: "Would you like keep selecting or stop this select?", preferredStyle: .Alert)
+                
+                let cancelAction = UIAlertAction(title:"Cancel",style:.Cancel){ (action) in self.updateCancel(nil) }
+                let continueAction = UIAlertAction(title:"Continue",style:.Default){ (action) in }
+                
+                nonSelectionAlert.addAction(cancelAction)
+                nonSelectionAlert.addAction(continueAction)
+                
+                self.presentViewController(nonSelectionAlert, animated: true, completion: nil)
             }
         default :
-            let updateActionSheet:UIActionSheet = UIActionSheet(title: nil, delegate: self, cancelButtonTitle: "Cancel", destructiveButtonTitle: "Update All", otherButtonTitles: "Choose to Update")
-            updateActionSheet.showInView(self.view)
-        }
-    }
-    func alertView(alertView: UIAlertView, clickedButtonAtIndex buttonIndex: Int) {
-        if buttonIndex == 0 {
-            updateCancel(nil)
-        }
-    }
-    /*
-    ActionSheet按钮响应函数
-    ButtonIndex:
-        0. 默认（缺省）按钮
-        1. 取消按钮
-        2. OtherButton中第1个，此后依此类推
-    */
-    func actionSheet(actionSheet: UIActionSheet, clickedButtonAtIndex buttonIndex: Int) {
-        switch buttonIndex {
-        case 0 :
-            updateWillStart(nil)        // 此处应首先获取所有需要更新用户之索引（已过期），暂时以所有用户代替
-        case 2 :
-            // 设置导航右侧按钮
-            updateButton.tag = 111
-            updateButton.title = "Select All"
+            let updateActionSheet = UIAlertController(title: nil, message: "Update all contacts or choose whom to update?", preferredStyle: .ActionSheet)
             
-            // 替换导航左侧按钮（先保存）
-            reuseAddBarButton = self.navigationItem.leftBarButtonItem!
+            let cancelAction = UIAlertAction(title:"Cancel",style:.Cancel){ (action) in }
+            let updateAllAction = UIAlertAction(title:"Update All",style:.Default){ (action) in
+                self.updateWillStart(nil)
+            }
+            let chooseAction = UIAlertAction(title:"Choose To Update",style:.Default){ (action) in
+                // 设置导航右侧按钮
+                self.updateButton.tag = 111
+                self.updateButton.title = "Select All"
+                
+                // 替换导航左侧按钮
+                self.reuseAddBarButton = self.navigationItem.leftBarButtonItem!     // 先保存原有按钮
+                var cancelNavButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: "updateCancel:")
+                self.navigationItem.setLeftBarButtonItem(cancelNavButton, animated: true)
+                
+                // 列表进入多选状态
+                self.tableView.allowsMultipleSelection = true
+                self.tableView.allowsMultipleSelectionDuringEditing = true
+                self.tableView.setEditing(true, animated: true)
+            }
             
-            var cancelNavButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: "updateCancel:")
-            self.navigationItem.setLeftBarButtonItem(cancelNavButton, animated: true)
+            updateActionSheet.addAction(updateAllAction)
+            updateActionSheet.addAction(chooseAction)
+            updateActionSheet.addAction(cancelAction)
             
-            // 列表进入多选状态
-            self.tableView.allowsMultipleSelection = true
-            self.tableView.allowsMultipleSelectionDuringEditing = true
-            self.tableView.setEditing(true, animated: true)
-        case 1 : // cancel button
-            break
-        default :
-            println(buttonIndex)
+            self.presentViewController(updateActionSheet, animated:true, completion: nil)
         }
     }
     
@@ -104,7 +113,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     func updateWillStart (indexPathsToUpdate:[NSIndexPath]?) {
         var contactUpdateViewController:ContactUpdateViewController = ContactUpdateViewController()
         var navControllerToUpdateView:UINavigationController = UINavigationController(rootViewController: contactUpdateViewController)
-        contactUpdateViewController.updateIndex = indexPathsToUpdate ?? //buildContactUpdateIndexArray(indexPathsToUpdate)
+        contactUpdateViewController.updateIndex = indexPathsToUpdate ?? [NSIndexPath](contactsList.values) //getAllIndexPaths()
         self.presentViewController(navControllerToUpdateView, animated: true, completion: nil)
     }
     
@@ -136,7 +145,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         if searchText != "" {
             contactSearchResults.removeAll(keepCapacity: false)
             var keywords:[String] = searchText.componentsSeparatedByString(" ")
-            var predicates:[NSPredicate] = [NSPredicate]()
+            var predicates:[NSPredicate] = [NSPredicate(format: "NOT(inGroup.name = %@)", "")!]
             for keyword in keywords {
                 if keyword != "" {
                     
@@ -148,7 +157,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
                         }else{
                             SC = .zipcodeAndAddress
                         }
-                    }else if languageDetectByFirstCharacter(keyword) == .Chinese && countElements(searchText) > 5 {      // 搜索内容为中文且字数大于5，搜索地址即可
+                    }else if languageDetectByFirstCharacter(keyword) == .Chinese && countElements(keyword) > 5 {      // 搜索内容为中文且字数大于5，搜索地址即可
                         SC = .addressOnly
                     }else{      // 先搜索姓名，再搜索地址？
                         SC = .nameAndAddress
@@ -156,20 +165,20 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
                     
                     switch SC {
                     case .zipcodeOnly :
-                        predicates.append(NSPredicate(format: "address.zipcode LIKE[cd] %@", keyword)!)
+                        predicates.append(NSPredicate(format: "address.zipcode CONTAINS[cd] %@", keyword)!)
                     case .zipcodeAndAddress :
-                        predicates.append(NSPredicate(format: "(address.full LIKE[cd] %@) OR (address.zipcode LIKE[cd] %@)", keyword, keyword)!)
+                        predicates.append(NSPredicate(format: "(address.full CONTAINS[cd] %@) OR (address.zipcode CONTAINS[cd] %@)", keyword, keyword)!)
                     case .addressOnly :
-                        predicates.append(NSPredicate(format: "address.full LIKE[cd] %@", keyword)!)
+                        predicates.append(NSPredicate(format: "address.full CONTAINS[cd] %@", keyword)!)
                     case .nameAndAddress :
-                        predicates.append(NSPredicate(format: "(name CONTAINS[cd] %@) OR (address.full LIKE[cd] %@)", keyword, keyword)!)
+                        predicates.append(NSPredicate(format: "(name CONTAINS[cd] %@) OR (address.full CONTAINS[cd] %@)", keyword, keyword)!)
                     default :
-                        predicates.append(NSPredicate(format: "(name CONTAINS[cd] %@) OR (address.full LIKE[cd] %@) OR (address.zipcode LIKE[cd] %@)", keyword, keyword, keyword)!)
+                        predicates.append(NSPredicate(format: "(name CONTAINS[cd] %@) OR (address.full CONTAINS[cd] %@) OR (address.zipcode CONTAINS[cd] %@)", keyword, keyword, keyword)!)
                     }
                 }
             }
-            let compoundPredicate:NSCompoundPredicate = NSPrediacate(type: .AndPredicateType, subpredicates: predicates)
-            contactSearchResults = loadContactsByPredicate(compoundPredicate) ?? [ProfileSaved]()
+            let compoundPredicate:NSCompoundPredicate = NSCompoundPredicate(type: .AndPredicateType, subpredicates: predicates)
+            contactSearchResults = loadContactsByPredicateWithSort(compoundPredicate) ?? [ProfileSaved]()
         }else{
             contactSearchResults = [ProfileSaved]()
         }
@@ -180,11 +189,9 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         return true
     }
     func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
-        println(searchText)
         search(searchText: searchText)
     }
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
-        println(searchBar.text)
         search(searchText: searchBar.text)
     }
     func searchDisplayController(controller: UISearchDisplayController, didLoadSearchResultsTableView tableView: UITableView) {
@@ -198,20 +205,20 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         if tableView == self.searchDisplayController?.searchResultsTableView {
             return 1
         }else{
-            return contactsGroups.count
+            return loadContactsGroups().count
         }
     }
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if tableView == self.searchDisplayController?.searchResultsTableView {
             return contactSearchResults.count
         }
-        return contactsGroups[section].count()
+        return loadContactsGroups()[section].count()
     }
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if tableView == self.searchDisplayController?.searchResultsTableView {
             return nil
         }
-        return contactsGroups[section].count() == 0 ? nil : contactsGroups[section].name
+        return loadContactsGroups()[section].count() == 0 ? nil : loadContactsGroups()[section].name
     }
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell:UITableViewCell =  self.tableView.dequeueReusableCellWithIdentifier("contactListCell") as UITableViewCell
@@ -219,8 +226,10 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
             cell.textLabel.text = contactSearchResults[indexPath.row].name
             cell.detailTextLabel?.text = contactSearchResults[indexPath.row].address.full
         }else{
-            let thisContact:ProfileSaved = loadContactsGroups(contactsGroups[indexPath.section])?[indexPath.row] ?? ProfileSaved()
+            let thisContact:ProfileSaved = loadContactByIndexPath(indexPath) ?? ProfileSaved()
+            
             contactsList[thisContact] = indexPath
+            
             cell.textLabel.text = thisContact.name
             cell.detailTextLabel?.text = thisContact.address.full
         }
@@ -238,11 +247,9 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         }else{
             var contactProfileVC:ContactProfileViewController = ContactProfileViewController()
             if tableView == self.searchDisplayController?.searchResultsTableView {
-                contactProfileVC.groupIndex = contactsList[contactSearchResults[indexPath.row]].section
-                contactProfileVC.contactIndex = contactsList[contactSearchResults[indexPath.row]].row
+                contactProfileVC.contactIndexPath = contactsList[contactSearchResults[indexPath.row]]!
             }else{
-                contactProfileVC.groupIndex = indexPath.section
-                contactProfileVC.contactIndex = indexPath.row
+                contactProfileVC.contactIndexPath = indexPath
             }
             self.navigationController?.pushViewController(contactProfileVC, animated: true)
         }
@@ -259,28 +266,43 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     iOS8 滑动删除（自定义）
     */
     override func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [AnyObject]? {
-        switch indexPath.section {
-        case 0 :
-            var revokeAction = UITableViewRowAction(style: UITableViewRowActionStyle.Normal, title: "Revoke") { (action, indexPath) -> Void in
-                markOrRevoke(indexPath)
-                self.tableView.reloadData()
-            }
-            revokeAction.backgroundColor = UIColor.grayColor()
-            
-            return [revokeAction]
-        default :
-            var markAction = UITableViewRowAction(style: UITableViewRowActionStyle.Normal, title: "Mark") { (action, indexPath) -> Void in
-                markOrRevoke(indexPath)
-                self.tableView.reloadData()
-            }
-            markAction.backgroundColor = UIColor.orangeColor()
-            
+        if tableView == self.searchDisplayController?.searchResultsTableView {
             var deleteAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Delete") { (action, indexPath) -> Void in
-                contactsGroups[indexPath.section].removeContactAtIndex(indexPath.row)
-                self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
+                if removeContactFromGroup(self.contactSearchResults[indexPath.row], deleteContactWithAddresses:true) {
+                    self.contactSearchResults.removeAtIndex(indexPath.row)
+                    tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
+                    self.tableView.reloadData()
+                }
             }
             
-            return [deleteAction, markAction]
+            return [deleteAction]
+        }else{
+            switch loadContactsGroups()[indexPath.section].name {
+            case "Marked" :
+                var revokeAction = UITableViewRowAction(style: UITableViewRowActionStyle.Normal, title: "Revoke") { (action, indexPath) -> Void in
+                    if markOrRevoke(indexPath) {
+                        self.tableView.reloadData()
+                    }
+                }
+                revokeAction.backgroundColor = UIColor.grayColor()
+                
+                return [revokeAction]
+            default :
+                var markAction = UITableViewRowAction(style: UITableViewRowActionStyle.Normal, title: "Mark") { (action, indexPath) -> Void in
+                    if markOrRevoke(indexPath) {
+                        self.tableView.reloadData()
+                    }
+                }
+                markAction.backgroundColor = UIColor.orangeColor()
+                
+                var deleteAction = UITableViewRowAction(style: UITableViewRowActionStyle.Default, title: "Delete") { (action, indexPath) -> Void in
+                    if removeContactFromGroup(loadContactByIndexPath(indexPath), deleteContactWithAddresses:true) {
+                        self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
+                    }
+                }
+                
+                return [deleteAction, markAction]
+            }
         }
     }
     
@@ -291,7 +313,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
     Unwind from ContactAddViewController
     */
     @IBAction func addDone(segue:UIStoryboardSegue) {
-        self.viewDidLoad()
+        self.tableView.reloadData()
     }
     
     @IBAction func addCancel(segue:UIStoryboardSegue) {
@@ -304,6 +326,50 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
 
 
 }
+/*
+let updateActionSheet:UIActionSheet = UIActionSheet(title: nil, delegate: self, cancelButtonTitle: "Cancel", destructiveButtonTitle: "Update All", otherButtonTitles: "Choose to Update")
+updateActionSheet.showInView(self.view)
+*/
+/*
+func alertView(alertView: UIAlertView, clickedButtonAtIndex buttonIndex: Int) {
+if buttonIndex == 0 {
+updateCancel(nil)
+}
+}
+*/
+/*
+ActionSheet按钮响应函数
+ButtonIndex:
+0. 默认（缺省）按钮
+1. 取消按钮
+2. OtherButton中第1个，此后依此类推
+
+func actionSheet(actionSheet: UIActionSheet, clickedButtonAtIndex buttonIndex: Int) {
+switch buttonIndex {
+case 0 :
+updateWillStart(nil)        // 此处应首先获取所有需要更新用户之索引（已过期），暂时以所有用户代替
+case 2 :
+// 设置导航右侧按钮
+updateButton.tag = 111
+updateButton.title = "Select All"
+
+// 替换导航左侧按钮（先保存）
+reuseAddBarButton = self.navigationItem.leftBarButtonItem!
+
+var cancelNavButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: "updateCancel:")
+self.navigationItem.setLeftBarButtonItem(cancelNavButton, animated: true)
+
+// 列表进入多选状态
+self.tableView.allowsMultipleSelection = true
+self.tableView.allowsMultipleSelectionDuringEditing = true
+self.tableView.setEditing(true, animated: true)
+case 1 : // cancel button
+break
+default :
+println(buttonIndex)
+}
+}
+*/
 
 /* iOS7 系统自带滑动删除（仅删除按钮）
 override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {

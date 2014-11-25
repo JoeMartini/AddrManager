@@ -18,11 +18,15 @@ class MyProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        myName.text = myProfile.name
-        myZipcode.text = myProfile.address.zipcode
-        myAddress.text = myProfile.address.full
-        
-        AMButton.frame.offset(dx: 0, dy: (myAddress.frame.minY + myAddress.layoutManager.usedRectForTextContainer(myAddress.textContainer).height + 16)-AMButton.frame.origin.y)
+        if let user = loadUserInfo().profile {
+            myName.text = user.name ?? ""
+            myZipcode.text = user.address.zipcode ?? ""
+            myAddress.text = user.address.full ?? ""
+            
+            AMButton.frame.offset(dx: 0, dy: (myAddress.frame.minY + myAddress.layoutManager.usedRectForTextContainer(myAddress.textContainer).height + 16)-AMButton.frame.origin.y)
+        }else{
+            self.performSegueWithIdentifier("myProfileEdit", sender: nil)
+        }
     }
     
     override func didReceiveMemoryWarning() {
@@ -34,9 +38,15 @@ class MyProfileViewController: UIViewController {
     @IBAction func editDone(segue:UIStoryboardSegue) {
         self.viewDidLoad()
     }
+    
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "authorizationManage" {
+        switch segue.identifier? as String! {
+        case "authorizationManage" :
             println("authorizationManage")
+        case "myProfileEdit" :
+            println("myProfileEdit")
+        default :
+            break
         }
     }
 }

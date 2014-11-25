@@ -60,13 +60,7 @@ func randomInRange(range: Range<Int>) -> Int {
     let count = UInt32(range.endIndex - range.startIndex)
     return  Int(arc4random_uniform(count)) + range.startIndex
 }
-/*
-enum contactSource:String {
-    case systemAddressBook = "系统通讯录"
-    //case manualAdded ＝ "用户添加"
-    case webServer = "云"
-}
-*/
+
 struct AddrAuthorization {
     
     var user:Profile
@@ -133,6 +127,13 @@ struct ContactsGroup {
 
 
 /*-*-*-*-*-*-*-*-*-*-*-以下无正文-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
+/*
+enum contactSource:String {
+case systemAddressBook = "系统通讯录"
+//case manualAdded ＝ "用户添加"
+case webServer = "云"
+}
+*/
 /* 新建个人信息
 func addNewProfile (Name:String, Address:String, Zipcode:String, Group:String?) {
 var needNewGroup:Bool = true

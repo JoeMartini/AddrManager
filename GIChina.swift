@@ -72,16 +72,7 @@ struct Address {
         self.identifier = identifier
     }
 }
-/*
-enum addrValidityPeriod:String {
-    case forever
-    case oneMonth
-    case threeMonths
-    case sixMonths
-    case oneYear
-    case fourYears
-}
-*/
+
 // 地址更新
 func updateAddress (ADIndexs:[Int], street:String? = nil) -> String {
     var ADs:[String] = [ADInquiry(ADIndexs[0]), ADInquiry(ADIndexs[0], cityIndex: ADIndexs[1]), ADInquiry(ADIndexs[0], cityIndex: ADIndexs[1], districtIndex: ADIndexs[2])]
@@ -176,7 +167,16 @@ func ADInquiry (provinceIndex:Int, cityIndex:Int? = nil, districtIndex:Int? = ni
 }
 
 /*-*-*-*-*-*-*-*-*-*-以下无正文-*-*-*-*-*-*-*-*-*-*/
-
+/*
+enum addrValidityPeriod:String {
+case forever
+case oneMonth
+case threeMonths
+case sixMonths
+case oneYear
+case fourYears
+}
+*/
 /*
 var countries:Array = ["中国"]
 var provinces:Array = [String]()

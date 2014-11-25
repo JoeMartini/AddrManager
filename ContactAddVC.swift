@@ -10,7 +10,6 @@ import UIKit
 
 class ContactAddViewController: UIViewController,UITextFieldDelegate {
     
-    @IBOutlet weak var navBar: UINavigationBar!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var addrPicker: UIPickerView!
     @IBOutlet weak var addrdetailTextField: UITextField!
@@ -23,6 +22,15 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        switch self.navigationController?.viewControllers.count ?? 0 {
+        case 1 :
+            break
+        default :
+            self.navigationItem.setLeftBarButtonItem(nil, animated: false)
+            self.navigationItem.setLeftBarButtonItem(nil, animated: false)
+            self.navigationItem.setRightBarButtonItem(UIBarButtonItem(title: "Done", style: UIBarButtonItemStyle.Done, target: self, action: "editDone:"), animated: false)
+        }
         
         zipcodeInquiryingIndicator.hidden = true
         
@@ -55,12 +63,24 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
             if addrdetailTextField.text == "" {
                 println("Error,no address detail")
             }
-            saveContactsInGroupIntoCoreData(Profile(name: nameTextField.text, address: Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)))
+            saveContactsInGroupIntoCoreData(buildUpProfile())
         case "contactAddCancel" :
             break
         default :
             break
         }
+    }
+    
+    func editDone (sender:AnyObject?) {
+        setUserInfoWithProfile(buildUpProfile())
+        self.navigationController?.viewControllers[0].viewDidLoad()
+        self.navigationController?.popToRootViewControllerAnimated(true)
+    }
+    
+    func buildUpProfile() -> Profile {
+        var addressToSave:Address = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)
+        addressToSave.zipcode = addressToSave.zipcode != zipcodeFextView.text ? zipcodeFextView.text : addressToSave.zipcode
+        return Profile(name: nameTextField.text, address: addressToSave)
     }
     
     @IBAction func typeInAddress(sender: AnyObject) {
@@ -69,8 +89,8 @@ class ContactAddViewController: UIViewController,UITextFieldDelegate {
     }
     
     @IBAction func nameEditEnd(sender: AnyObject) {
-        //println("\(nameTextField.text)")
     }
+    
     @IBAction func addrdetailEditEnd(sender: AnyObject) {
         zipcodeInquiryingIndicator.hidden = false
         zipcodeInquiryingIndicator.startAnimating()

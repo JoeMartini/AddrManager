@@ -52,8 +52,8 @@ public class Date {
         return Date(fromNSDate: fromNSDate)
     }
     
-    public class func convertDateToNSDate (date:Date) -> NSDate {
-        return date.originalDate
+    public class func convertDateToNSDate (date:Date?) -> NSDate? {
+        return date == nil ? nil : date!.originalDate
     }
     
     func toNSDate () -> NSDate {

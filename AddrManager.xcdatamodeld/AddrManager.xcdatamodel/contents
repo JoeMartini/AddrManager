@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6252" systemVersion="14B25" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="AddressSaved" representedClassName="AddrManager.AddressSaved" syncable="YES">
+        <attribute name="buildTime" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="city" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="cityIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="district" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="districtIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="full" attributeType="String" syncable="YES"/>
+        <attribute name="province" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="provinceIndex" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="street" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="validityPeriod" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="zipcode" attributeType="String" syncable="YES"/>
+        <relationship name="belongsTo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProfileSaved" inverseName="allAddresses" inverseEntity="ProfileSaved" syncable="YES"/>
+    </entity>
+    <entity name="ContactsGroupSaved" representedClassName="AddrManager.ContactsGroupSaved" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="contacts" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ProfileSaved" inverseName="inGroup" inverseEntity="ProfileSaved" syncable="YES"/>
+    </entity>
+    <entity name="ProfileSaved" representedClassName="AddrManager.ProfileSaved" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="source" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="updateTime" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="userID" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="address" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AddressSaved" syncable="YES"/>
+        <relationship name="allAddresses" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="AddressSaved" inverseName="belongsTo" inverseEntity="AddressSaved" syncable="YES"/>
+        <relationship name="inGroup" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ContactsGroupSaved" inverseName="contacts" inverseEntity="ContactsGroupSaved" syncable="YES"/>
+    </entity>
+    <entity name="UserAuthorization" representedClassName="AddrManager.UserAuthorization" syncable="YES">
+        <attribute name="authorization" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="limitTime" optional="YES" attributeType="Date" syncable="YES"/>
+        <relationship name="profile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProfileSaved" syncable="YES"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserInfo" inverseName="authorization" inverseEntity="UserInfo" syncable="YES"/>
+    </entity>
+    <entity name="UserInfo" representedClassName="AddrManager.UserInfo" syncable="YES">
+        <relationship name="authorization" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="UserAuthorization" inverseName="user" inverseEntity="UserAuthorization" syncable="YES"/>
+        <relationship name="profile" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ProfileSaved" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="AddressSaved" positionX="-74" positionY="74" width="146" height="223"/>
+        <element name="ContactsGroupSaved" positionX="360" positionY="288" width="144" height="73"/>
+        <element name="ProfileSaved" positionX="144" positionY="135" width="144" height="148"/>
+        <element name="UserInfo" positionX="574" positionY="144" width="146" height="73"/>
+        <element name="UserAuthorization" positionX="360" positionY="-0" width="144" height="103"/>
+    </elements>
+</model>

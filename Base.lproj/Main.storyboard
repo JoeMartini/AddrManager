@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" initialViewController="n4r-Fj-eSC">
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
     </dependencies>
     <scenes>
@@ -42,7 +41,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" text="Name" textAlignment="center" lineBreakMode="tailTruncation" minimumFontSize="10" id="zEq-FU-wV5">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" text="Name" lineBreakMode="tailTruncation" minimumFontSize="10" id="zEq-FU-wV5">
                                 <rect key="frame" x="16" y="82" width="97" height="42"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -74,7 +73,7 @@
                     <navigationItem key="navigationItem" title="My Profile" id="YM0-Hf-WE7">
                         <barButtonItem key="rightBarButtonItem" title="Edit" id="1rt-IR-fuH">
                             <connections>
-                                <segue destination="vve-9e-qBy" kind="push" identifier="myProfileEdit" id="DL3-f3-mGF"/>
+                                <segue destination="udr-tl-YUR" kind="push" identifier="myProfileEdit" id="9Yi-09-JMe"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -257,7 +256,7 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="1430" y="344"/>
+            <point key="canvasLocation" x="2001" y="354"/>
         </scene>
         <!--Authorization Management-->
         <scene sceneID="GXV-hv-tCc">
@@ -397,9 +396,9 @@
                                 </state>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="bWf-4a-YQD">
-                                <rect key="frame" x="16" y="518" width="100" height="30"/>
+                                <rect key="frame" x="15" y="518" width="103" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Inport Contact">
+                                <state key="normal" title="import Contact">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
@@ -413,15 +412,10 @@
                                 <color key="textColor" red="0.29803922772407532" green="0.29803922772407532" blue="0.29803922772407532" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" id="Kb1-dB-5Yh">
-                                <rect key="frame" x="124" y="523" width="20" height="20"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <connections>
-                        <outlet property="contactImprotingIndicator" destination="Kb1-dB-5Yh" id="0Ba-I8-2hS"/>
                         <outlet property="passwordInputTextField" destination="Rfa-26-x9a" id="nkf-r3-iPN"/>
                         <outlet property="userIDInputTextField" destination="8Q9-O1-mM2" id="wkY-JS-DUC"/>
                     </connections>
@@ -475,7 +469,7 @@
             </objects>
             <point key="canvasLocation" x="498" y="-376"/>
         </scene>
-        <!--List-->
+        <!--Contacts-->
         <scene sceneID="K6N-w0-BmX">
             <objects>
                 <tableViewController id="Wh1-eh-Gbu" customClass="ContactlistTableViewController" customModule="AddrManager" customModuleProvider="target" sceneMemberID="viewController">
@@ -519,7 +513,7 @@
                         </connections>
                     </tableView>
                     <tabBarItem key="tabBarItem" tag="2" title="List" image="first" id="cYz-Y5-NUN"/>
-                    <navigationItem key="navigationItem" title="List" id="dbE-rS-GMN">
+                    <navigationItem key="navigationItem" title="Contacts" id="dbE-rS-GMN">
                         <barButtonItem key="leftBarButtonItem" title="Add" id="pKC-kW-S5f">
                             <connections>
                                 <segue destination="Gx1-36-txm" kind="modal" identifier="contactAdd" id="huh-QV-Wec"/>
@@ -549,7 +543,7 @@
             </objects>
             <point key="canvasLocation" x="970" y="-376"/>
         </scene>
-        <!--Name-->
+        <!--Contact Add View Controller-->
         <scene sceneID="WbQ-7W-cHK">
             <objects>
                 <viewController id="udr-tl-YUR" customClass="ContactAddViewController" customModule="AddrManager" customModuleProvider="target" sceneMemberID="viewController">
@@ -696,7 +690,7 @@
                             <outletCollection property="gestureRecognizers" destination="Ucr-qu-nMq" appends="YES" id="Kh1-LW-6EI"/>
                         </connections>
                     </view>
-                    <navigationItem key="navigationItem" title="Name" id="kh4-x8-p36">
+                    <navigationItem key="navigationItem" id="kh4-x8-p36">
                         <barButtonItem key="leftBarButtonItem" systemItem="cancel" id="6mm-jt-eCV">
                             <connections>
                                 <segue destination="Cyo-Sd-bbn" kind="unwind" identifier="contactAddCancel" unwindAction="addCancel:" id="E9b-C5-agh"/>
@@ -728,7 +722,7 @@
                     </connections>
                 </tapGestureRecognizer>
             </objects>
-            <point key="canvasLocation" x="1887" y="-376"/>
+            <point key="canvasLocation" x="1430" y="354"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="5s6-Cj-qHV">
@@ -756,4 +750,7 @@
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination" type="retina4"/>
     </simulatedMetricsContainer>
+    <inferredMetricsTieBreakers>
+        <segue reference="9Yi-09-JMe"/>
+    </inferredMetricsTieBreakers>
 </document>

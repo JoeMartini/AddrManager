@@ -37,7 +37,7 @@ struct Address {
         self.province = province
         self.city = city
         self.district = district
-        self.full = updateAddressDirectly([province ?? "", city ?? "", district ?? ""], street)
+        self.full = updateAddressDirectly([province ?? "", city ?? "", district ?? ""], street: street)
         self.zipcode = zipcodeInquiry(self.full)
     }
     
@@ -53,7 +53,8 @@ struct Address {
         self.province = ADInquiry(provinceIndex)
         self.city = ADInquiry(provinceIndex, cityIndex: cityIndex)
         self.district = ADInquiry(provinceIndex, cityIndex: cityIndex, districtIndex: districtIndex)
-        self.full = updateAddressDirectly([self.province!, self.city!, self.district!], street)
+        self.street = street
+        self.full = updateAddressDirectly([self.province!, self.city!, self.district!], street: street)
         self.zipcode = zipcodeInquiry(self.full)
     }
     
@@ -76,9 +77,9 @@ struct Address {
 // 地址更新
 func updateAddress (ADIndexs:[Int], street:String? = nil) -> String {
     var ADs:[String] = [ADInquiry(ADIndexs[0]), ADInquiry(ADIndexs[0], cityIndex: ADIndexs[1]), ADInquiry(ADIndexs[0], cityIndex: ADIndexs[1], districtIndex: ADIndexs[2])]
-    return updateAddressDirectly(ADs, street)
+    return updateAddressDirectly(ADs, street: street)
 }
-func updateAddressDirectly (ADs:[String], street:String?) -> String {
+func updateAddressDirectly (ADs:[String], street:String? = nil) -> String {
     var address = ""
     for AD in ADs {
         if !address.hasPrefix(AD) && AD != "" {     // 避免直辖市重复两添加，如“上海市上海市”；对于省份为空，避免连入空格
@@ -101,7 +102,7 @@ php脚本抓取百度邮编搜索结果页面中的表格，输出第一页18个
 3. 地址需要转换成utf－8，偶尔有转换失败
 4. 未做错误处理
 */
-func zipcodeInquiry (address:String) -> String {
+func zipcodeInquiry (address:String, doubleCheck:Bool = true) -> String {
     func inquiry(address:String) -> String? {
         // 服务器查询地址前缀
         let prefix:String = "http://martini.wang/dev_resources/zipcode.php?addr="
@@ -116,17 +117,14 @@ func zipcodeInquiry (address:String) -> String {
     if address != "" && languageDetectByFirstCharacter(address) == .Chinese {
         if let result = inquiry(address) {
             return result
-        }else{
+        }else if doubleCheck {
             if let ADs = ADsInFullAddress(address) {
-                let ADAddr = updateAddressDirectly([ADInquiry(ADs.provinceIndex, cityIndex: ADs.cityIndex, districtIndex: ADs.districtIndex)], nil)
+                let ADAddr = updateAddressDirectly([ADInquiry(ADs.provinceIndex, cityIndex: ADs.cityIndex, districtIndex: ADs.districtIndex)])
                 return inquiry(ADAddr) ?? "000000"
-            }else{
-                return "000000"
             }
         }
-    }else{
-        return "000000"
     }
+    return "000000"
 }
 
 func ADsInFullAddress (address:String) -> (provinceIndex:Int, cityIndex:Int?, districtIndex:Int?)? {
@@ -158,12 +156,28 @@ let ADChinaSwiftJSON:JSON = JSON(data: ADChinaJsonNSData ?? NSData(), options: N
 func ADInquiry (provinceIndex:Int, cityIndex:Int? = nil, districtIndex:Int? = nil) -> String {
     var AD:String = ""
     if cityIndex == nil {   // if city index is nil, district index should be nil, this inquiry has only province index
-        return ADChinaSwiftJSON["result"][provinceIndex]["province"].stringValue
+        if let province = loadProvinceByIndex(provinceIndex) {
+            return province.name
+        }
+         //ADChinaSwiftJSON["result"][provinceIndex]["province"].stringValue
     } else if districtIndex == nil {   // if city index isn't nil while districtindex is nil, this inquiry has province index and city index
-        return ADChinaSwiftJSON["result"][provinceIndex]["city"][cityIndex!]["city"].stringValue
+        if let province = loadProvinceByIndex(provinceIndex) {
+            if let city = loadCityByIndex(cityIndex!, inProvince: province) {
+                return city.name
+            }
+        }
+        //return ADChinaSwiftJSON["result"][provinceIndex]["city"][cityIndex!]["city"].stringValue
     } else {    // if city index and district index are all not nil, this inquiry deserve districe
-        return ADChinaSwiftJSON["result"][provinceIndex]["city"][cityIndex!]["district"][districtIndex!]["district"].stringValue
+        if let province = loadProvinceByIndex(provinceIndex) {
+            if let city = loadCityByIndex(cityIndex!, inProvince: province) {
+                if let district = loadDistrictByIndex(districtIndex!, inCity: city) {
+                    return district.name
+                }
+            }
+        }
+        //return ADChinaSwiftJSON["result"][provinceIndex]["city"][cityIndex!]["district"][districtIndex!]["district"].stringValue
     }
+    return ""
 }
 
 /*-*-*-*-*-*-*-*-*-*-以下无正文-*-*-*-*-*-*-*-*-*-*/

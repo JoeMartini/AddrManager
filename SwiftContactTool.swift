@@ -41,14 +41,17 @@ func getSysContacts() -> [Profile] {
                     // 地址
                     case kABPersonAddressProperty :
                         var addrNSDict:NSMutableDictionary = value.takeRetainedValue() as NSMutableDictionary
-                        var tmpAddrKey:String = i>0 ? "Address\(i)" : "Address"
-                        valueDictionary[tmpAddrKey] = Address(province: (addrNSDict.valueForKey(kABPersonAddressStateKey) as? String), city: (addrNSDict.valueForKey(kABPersonAddressCityKey) as? String), district: nil, street: (addrNSDict.valueForKey(kABPersonAddressStreetKey) as? String), identifier:tmpAddrKey)
+                        // 暂时忽略英文地址
+                        if languageDetectByFirstCharacter(addrNSDict.valueForKey(kABPersonAddressStreetKey) as? String ?? "") == language.Chinese {
+                            var tmpAddrKey:String = valueDictionary.isEmpty ? "Address" : "Address\(i)"
+                            valueDictionary[tmpAddrKey] = Address(province: (addrNSDict.valueForKey(kABPersonAddressStateKey) as? String), city: (addrNSDict.valueForKey(kABPersonAddressCityKey) as? String), district: nil, street: (addrNSDict.valueForKey(kABPersonAddressStreetKey) as? String), identifier:tmpAddrKey)
+                        }
                     default :
                         valueDictionary[label] = value.takeRetainedValue() as? String ?? ""
                     }
                 }
                 
-                return valueDictionary
+                return valueDictionary.isEmpty ? nil : valueDictionary
             }else{
                 return nil
             }
@@ -56,30 +59,46 @@ func getSysContacts() -> [Profile] {
         
         for contact in sysContacts {
             var currentContact:Profile = Profile()
-            
+            var effectiveContact:Bool = true
             currentContact.source = "systemAddressBook"
-            currentContact.firstName = ABRecordCopyValue(contact, kABPersonFirstNameProperty)?.takeRetainedValue() as String?
-            currentContact.lastName = ABRecordCopyValue(contact, kABPersonLastNameProperty)?.takeRetainedValue() as String?
+            currentContact.firstName = ABRecordCopyValue(contact, kABPersonFirstNameProperty)?.takeRetainedValue() as? String
+            currentContact.lastName = ABRecordCopyValue(contact, kABPersonLastNameProperty)?.takeRetainedValue() as? String
             // 姓名整理
             switch languageDetectByFirstCharacter((currentContact.firstName? ?? "") + (currentContact.lastName? ?? "")) {
             case .Chinese :
                 // 中文
-                currentContact.name = (currentContact.lastName? ?? "") + (currentContact.firstName != nil ? " " + currentContact.firstName! : "")
+                currentContact.name = (currentContact.lastName ?? "") + (currentContact.firstName ?? "")
             default :
                 // 英文
-                currentContact.name = (currentContact.firstName? ?? "") + (currentContact.lastName != nil ? " " + currentContact.lastName! : "")
+                currentContact.name = (currentContact.firstName ?? "") + (currentContact.lastName != nil ? " " + currentContact.lastName! : "")
             }
-            // 地址
-            for (key, value) in (analyzeContactProperty(contact, kABPersonAddressProperty, "Address") as? [String:Address]) ?? ["":Address()] {
-                currentContact.addresses?.append(value)
-                if key == "Address" {
-                    currentContact.address = value
-                }
+            if currentContact.name == "" {
+                effectiveContact = false
             }
             
-            allContacts.append(currentContact)
+            // 地址
+            if let addresses = analyzeContactProperty(contact, kABPersonAddressProperty, "Address") as? [String:Address] {
+                currentContact.address = addresses["Address"]!
+                if addresses.count > 1 {
+                    for (key, value) in addresses {
+                        //if key != "Address" {   }       若默认地址不应出现于所有地址数组中，则放入此判断中
+                        if var currentContactAddresses = currentContact.addresses {
+                            currentContactAddresses.append(value)
+                        }else{
+                            currentContact.addresses = [value]
+                        }
+                    }
+                }
+            }else{
+                effectiveContact = false
+            }
+            
+            if effectiveContact {
+                allContacts.append(currentContact)
+            }
         }
         
+        println(allContacts.count)
         return allContacts
     }
     

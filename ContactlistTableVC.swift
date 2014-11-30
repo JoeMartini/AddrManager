@@ -44,6 +44,50 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         }
     }
     
+    @IBAction func addActionSheet(sender: AnyObject) {
+        let addActionSheet:UIAlertController = UIAlertController(title: "How to add a contact?", message: "With the option 'import system contacts', we will find out all your contacts whom already has an address.", preferredStyle: UIAlertControllerStyle.ActionSheet)
+        let importAction:UIAlertAction = UIAlertAction(title: "Import system contacts", style: UIAlertActionStyle.Default) { (action) -> Void in
+            
+            let inProgressAlert = UIAlertController(title: "请耐心等候", message: "若联系人较多，导入时间会较长", preferredStyle: UIAlertControllerStyle.Alert)
+            
+            var chrysanthemum:UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
+            chrysanthemum.frame = CGRect(origin: CGPoint(x: inProgressAlert.view.bounds.origin.x, y: inProgressAlert.view.bounds.origin.y + 88.0), size: inProgressAlert.view.bounds.size)
+            chrysanthemum.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+            chrysanthemum.startAnimating()
+            
+            inProgressAlert.view.addSubview(chrysanthemum)
+            
+            self.presentViewController(inProgressAlert, animated: true, completion: {
+                var sysContacts:Array = getSysContacts()
+                for sysContact in sysContacts {
+                    // 只导入系统通讯录中有地址的联系人
+                    if sysContact.address.full != "" && sysContact.name != "" {
+                        let duplicatePredicate = NSPredicate(format: "(name = %@) AND (address.full = %@)", sysContact.name, sysContact.address.full)!
+                        if (loadContactsByPredicateWithSort(duplicatePredicate) ?? []).isEmpty {
+                            saveContactsInGroupIntoCoreData(sysContact)
+                        }else{
+                            println("Duplicated")
+                        }
+                    }
+                }
+            })
+            
+            inProgressAlert.dismissViewControllerAnimated(true, completion: {
+                self.tableView.reloadData()
+            })
+        }
+        let inputAction:UIAlertAction = UIAlertAction(title: "Input a contact", style: UIAlertActionStyle.Default) { (action) -> Void in
+            // 调出添加界面
+            if let navControllerToInputVC:UINavigationController = self.storyboard?.instantiateViewControllerWithIdentifier("navToInputVC") as? UINavigationController {
+                self.presentViewController(navControllerToInputVC, animated: true, completion: nil)
+            }
+        }
+        let cancelAction:UIAlertAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil)
+        addActionSheet.addAction(importAction)
+        addActionSheet.addAction(inputAction)
+        addActionSheet.addAction(cancelAction)
+        self.presentViewController(addActionSheet, animated: true, completion: nil)
+    }
     /*
     导航栏右侧按钮
         默认状态：更新启动按钮，弹出更新选项

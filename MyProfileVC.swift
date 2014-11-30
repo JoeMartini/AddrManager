@@ -43,8 +43,6 @@ class MyProfileViewController: UIViewController {
         switch segue.identifier? as String! {
         case "authorizationManage" :
             println("authorizationManage")
-        case "myProfileEdit" :
-            println("myProfileEdit")
         default :
             break
         }

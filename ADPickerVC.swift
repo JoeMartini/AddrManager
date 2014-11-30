@@ -34,11 +34,11 @@ class ADPickerViewController: UIViewController, UIPickerViewDataSource, UIPicker
     func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         switch component {
         case 0 :
-            return ADChinaSwiftJSON["result"].count
+            return loadAllProvinces()!.count//ADChinaSwiftJSON["result"].count
         case 1 :
-            return ADChinaSwiftJSON["result"][pickerView.selectedRowInComponent(0)]["city"].count
+            return loadProvinceByIndex(pickerView.selectedRowInComponent(0))!.count()//ADChinaSwiftJSON["result"][pickerView.selectedRowInComponent(0)]["city"].count
         case 2 :
-            return ADChinaSwiftJSON["result"][pickerView.selectedRowInComponent(0)]["city"][pickerView.selectedRowInComponent(1)]["district"].count
+            return loadCityByIndex(pickerView.selectedRowInComponent(1), inProvince: loadProvinceByIndex(pickerView.selectedRowInComponent(0))!)!.count()//ADChinaSwiftJSON["result"][pickerView.selectedRowInComponent(0)]["city"][pickerView.selectedRowInComponent(1)]["district"].count
         default :
             return 5
         }

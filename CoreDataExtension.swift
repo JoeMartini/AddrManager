@@ -50,15 +50,15 @@ func buildContactsGroupByName (groupName:String, MOC:NSManagedObjectContext = ma
 }
 
 // 根据一定条件查找用户，默认按照姓名排序
-func loadContactsByPredicateWithSort (predicate:NSPredicate, sortBy sortDescriptor:NSSortDescriptor = NSSortDescriptor(key: "name", ascending: true), MOC:NSManagedObjectContext = managedObjectContext!) -> [ProfileSaved]? {
+func loadContactsByPredicateWithSort (predicate:NSPredicate, sortBy sortDescriptor:NSSortDescriptor = NSSortDescriptor(key: "namePhonetic", ascending: true), MOC:NSManagedObjectContext = managedObjectContext!) -> [ProfileSaved]? {
     let contactFetchRequest:NSFetchRequest = NSFetchRequest(entityName: "ProfileSaved")
     contactFetchRequest.predicate = predicate
     contactFetchRequest.sortDescriptors = [sortDescriptor]
     return MOC.executeFetchRequest(contactFetchRequest, error: nil) as? [ProfileSaved]
 }
 
-// 读取某用户组中所有用户，默认按照姓名排序
-func loadContactsByGroup (contactsGroup:ContactsGroupSaved, sortBy sortKey:String = "name", ascending:Bool = true) -> [ProfileSaved]? {
+// 读取某用户组中所有用户，默认按照姓名拼音排序
+func loadContactsByGroup (contactsGroup:ContactsGroupSaved, sortBy sortKey:String = "namePhonetic", ascending:Bool = true) -> [ProfileSaved]? {
     let contactPrediacte:NSPredicate = NSPredicate(format: "inGroup = %@", contactsGroup)!
     let sortDescriptor = NSSortDescriptor(key: sortKey, ascending: ascending)
     if let contacts = loadContactsByPredicateWithSort(contactPrediacte,sortBy:sortDescriptor) {
@@ -88,6 +88,7 @@ func saveContactWithProfile (contact:Profile, MOC:NSManagedObjectContext = manag
     let contactToSave = NSEntityDescription.insertNewObjectForEntityForName("ProfileSaved", inManagedObjectContext: MOC) as ProfileSaved
     contactToSave.setValuesForKeysWithDictionary([
         "name":contact.name,
+        "namePhonetic":contact.namePhonetic,
         "source":contact.source,
         "userID":contact.userID
         ])

@@ -35,6 +35,7 @@
     </entity>
     <entity name="ProfileSaved" representedClassName="AddrManager.ProfileSaved" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="namePhonetic" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="source" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="updateTime" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="userID" optional="YES" attributeType="String" syncable="YES"/>
@@ -65,7 +66,7 @@
         <element name="ContactsGroupSaved" positionX="288" positionY="485" width="144" height="73"/>
         <element name="Country" positionX="9" positionY="171" width="144" height="88"/>
         <element name="District" positionX="-558" positionY="153" width="144" height="103"/>
-        <element name="ProfileSaved" positionX="90" positionY="333" width="144" height="148"/>
+        <element name="ProfileSaved" positionX="90" positionY="333" width="144" height="163"/>
         <element name="Province" positionX="-180" positionY="153" width="144" height="118"/>
         <element name="UserAuthorization" positionX="279" positionY="288" width="144" height="103"/>
         <element name="UserInfo" positionX="466" positionY="395" width="146" height="73"/>

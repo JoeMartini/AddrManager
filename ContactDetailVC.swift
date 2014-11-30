@@ -115,7 +115,6 @@ class ContactProfileViewController: UIViewController {
     
     func displayByIndexPath (contactIndexPath:NSIndexPath) {
         if let currentProfile = loadContactByIndexPath(contactIndexPath) {
-            //self.title = currentProfile.name
             nameLabel.text = currentProfile.name
             zipcodeTextView.text = currentProfile.address.zipcode
             addressTextView.text = currentProfile.address.full

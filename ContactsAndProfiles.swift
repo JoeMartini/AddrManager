@@ -18,12 +18,15 @@ struct Profile {
     
     var userID:String
     var name:String
+    var namePhonetic:String
     var address:Address
     var updateTime:Date
     var source:String
     
     var firstName:String?
+    var firstNamePhonetic:String?
     var lastName:String?
+    var lastNamePhonetic:String?
     
     var note:String?
     
@@ -41,8 +44,14 @@ struct Profile {
     }
     
     init (name:String, address:Address, source:String) {
+        var namePhonetic = getPinyin(name)
+        self.init(name:name, namePhonetic:namePhonetic, address:address, source:"")
+    }
+    
+    init (name:String, namePhonetic:String, address:Address, source:String) {
         self.userID = buildUserID()
         self.name = name
+        self.namePhonetic = namePhonetic
         self.address = address
         self.updateTime = today     // Data.swift 中的全局变量
         self.source = source

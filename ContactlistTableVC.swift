@@ -58,6 +58,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
             inProgressAlert.view.addSubview(chrysanthemum)
             
             self.presentViewController(inProgressAlert, animated: true, completion: {
+                let startTime = NSDate()
                 var sysContacts:Array = getSysContacts()
                 for sysContact in sysContacts {
                     // 只导入系统通讯录中有地址的联系人
@@ -69,7 +70,9 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
                             println("Duplicated")
                         }
                     }
+                    self.tableView.reloadData()
                 }
+                println(NSDate().timeIntervalSinceDate(startTime))
             })
             
             inProgressAlert.dismissViewControllerAnimated(true, completion: {
@@ -180,6 +183,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         enum searchCategory {
             case zipcodeOnly
             case nameOnly
+            case namePhoneticOnly
             case addressOnly
             case nameAndAddress
             case zipcodeAndAddress
@@ -203,11 +207,16 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
                         }
                     }else if languageDetectByFirstCharacter(keyword) == .Chinese && countElements(keyword) > 5 {      // 搜索内容为中文且字数大于5，搜索地址即可
                         SC = .addressOnly
+                    }else if languageDetectByFirstCharacter(keyword) != .Chinese {
+                        SC = .namePhoneticOnly
                     }else{      // 先搜索姓名，再搜索地址？
                         SC = .nameAndAddress
                     }
                     
                     switch SC {
+                    case .namePhoneticOnly :
+                        let keyPinyin = getPinyin(keyword, withPhonetic: false)
+                        predicates.append(NSPredicate(format: "namePhonetic CONTAINS[cd] %@", keyPinyin)!)
                     case .zipcodeOnly :
                         predicates.append(NSPredicate(format: "address.zipcode CONTAINS[cd] %@", keyword)!)
                     case .zipcodeAndAddress :
@@ -271,9 +280,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
             cell.detailTextLabel?.text = contactSearchResults[indexPath.row].address.full
         }else{
             let thisContact:ProfileSaved = loadContactByIndexPath(indexPath) ?? ProfileSaved()
-            
             contactsList[thisContact] = indexPath
-            
             cell.textLabel.text = thisContact.name
             cell.detailTextLabel?.text = thisContact.address.full
         }

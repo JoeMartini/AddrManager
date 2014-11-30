@@ -62,16 +62,27 @@ func getSysContacts() -> [Profile] {
             var effectiveContact:Bool = true
             currentContact.source = "systemAddressBook"
             currentContact.firstName = ABRecordCopyValue(contact, kABPersonFirstNameProperty)?.takeRetainedValue() as? String
+            currentContact.firstNamePhonetic = ABRecordCopyValue(contact, kABPersonFirstNamePhoneticProperty)?.takeRetainedValue() as? String
             currentContact.lastName = ABRecordCopyValue(contact, kABPersonLastNameProperty)?.takeRetainedValue() as? String
+            currentContact.lastNamePhonetic = ABRecordCopyValue(contact, kABPersonLastNamePhoneticProperty)?.takeRetainedValue() as? String
+            
             // 姓名整理
             switch languageDetectByFirstCharacter((currentContact.firstName? ?? "") + (currentContact.lastName? ?? "")) {
             case .Chinese :
                 // 中文
                 currentContact.name = (currentContact.lastName ?? "") + (currentContact.firstName ?? "")
+                /*
+                if currentContact.firstNamePhonetic != nil || currentContact.lastNamePhonetic != nil {
+                    currentContact.namePhonetic = (currentContact.lastNamePhonetic ?? "") + (currentContact.firstNamePhonetic != nil ? " " + currentContact.firstNamePhonetic! : "")
+                }else{
+                    currentContact.namePhonetic = getPinyin(currentContact.lastName ?? "" + (currentContact.firstName == nil ? "" : " " + getPinyin(currentContact.firstName!)))
+                }*/
             default :
                 // 英文
                 currentContact.name = (currentContact.firstName ?? "") + (currentContact.lastName != nil ? " " + currentContact.lastName! : "")
             }
+            currentContact.namePhonetic = getPinyin(currentContact.name)
+            
             if currentContact.name == "" {
                 effectiveContact = false
             }
@@ -147,6 +158,16 @@ func languageDetectByFirstCharacter (str:String?) -> language {
     return language.ND
 }
 
+func getPinyin (cn:String, withPhonetic:Bool = true) -> String {
+    var pinyin = NSMutableString(string: cn) as CFMutableStringRef
+    if withPhonetic {
+        CFStringTransform(pinyin, nil, kCFStringTransformMandarinLatin, Boolean(0))
+        return pinyin as String
+    }else{
+        CFStringTransform(pinyin, nil, kCFStringTransformStripCombiningMarks, Boolean(0))
+        return pinyin as String
+    }
+}
 // 名、名字拼音
 //currentContact.firstNamePhonetic = ABRecordCopyValue(contact, kABPersonFirstNamePhoneticProperty)?.takeRetainedValue() as String?
 // 姓、姓氏拼音

@@ -10,9 +10,8 @@ import UIKit
 
 class ContactProfileViewController: UIViewController {
     
-    var groupIndex:Int = 0
-    var contactIndex:Int = 0    //联系人索引值
-    var currentProfile:Profile = Profile()
+    var contactIndexPath:NSIndexPath = NSIndexPath(forRow: 0, inSection: 0)
+    var currentProfile:ProfileSaved = buildContactIfNotExist(loadContactByIndexPath (NSIndexPath(forRow: 0, inSection: 0)))
     
     var nameLabel:UILabel = UILabel()
     var zipcodeLabel:UILabel = UILabel()
@@ -23,8 +22,7 @@ class ContactProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // 导航标题
-        self.navigationController?.title = currentProfile.name
+        // 导航
         var nextBarButton = UIBarButtonItem(title: "Next", style: UIBarButtonItemStyle.Done, target: self, action: "showNext:")
         var beforeBarButton = UIBarButtonItem(title: "Before", style: UIBarButtonItemStyle.Done, target: self, action: "showBefore:")
         var moreInfoBarButton = UIBarButtonItem(title: "More", style: UIBarButtonItemStyle.Done, target: self, action: "showMoreInfo:")
@@ -69,7 +67,7 @@ class ContactProfileViewController: UIViewController {
         addressTextView.bounces = true
         addressTextView.dataDetectorTypes = UIDataDetectorTypes.Address
         
-        display(groupIndex, contactIndex: contactIndex)
+        displayByIndexPath(contactIndexPath)
         
         // 显示界面
         self.view.addSubview(nameLabel)
@@ -84,38 +82,43 @@ class ContactProfileViewController: UIViewController {
     }
     
     func showNext (sender:AnyObject?) {
-        
-        if contactIndex == allProfiles[groupIndex].count()-1 {
-            if groupIndex == countNotEmptyContactsGroups(allProfiles)-1 {
-                println("Last contact")
+        func indexPathNext (inout indexPath:NSIndexPath) {
+            if indexPath.row == loadContactsGroups()[indexPath.section].count()-1 {
+                if indexPath.section == loadContactsGroups().count-1 {
+                    println("Last contact")
+                }else{
+                    indexPath = NSIndexPath(forRow: 0, inSection: indexPath.section + 1)
+                }
             }else{
-                groupIndex += 1
-                contactIndex = 0
+                indexPath = NSIndexPath(forRow: indexPath.row + 1, inSection: indexPath.section)
             }
-        }else{
-            contactIndex += 1
         }
-        display(groupIndex, contactIndex: contactIndex)
+        indexPathNext(&contactIndexPath)
+        displayByIndexPath(contactIndexPath)
     }
+    
     func showBefore (sender:AnyObject?) {
-        
-        if contactIndex == 0 {
-            if groupIndex == 0 {
-                println("First contact")
+        func indexPathBefore (inout indexPath:NSIndexPath)  {
+            if indexPath.row == 0 {
+                if indexPath.section == 0 {
+                    println("First contact")
+                }else{
+                    indexPath = NSIndexPath(forRow: loadContactsGroups()[indexPath.section - 1].count() - 1, inSection: indexPath.section - 1)
+                }
             }else{
-                groupIndex -= 1
-                contactIndex = allProfiles[groupIndex].count() - 1
+                indexPath = NSIndexPath(forRow: indexPath.row - 1, inSection: indexPath.section)
             }
-        }else{
-            contactIndex -= 1
         }
-        display(groupIndex, contactIndex: contactIndex)
+        indexPathBefore(&contactIndexPath)
+        displayByIndexPath(contactIndexPath)
     }
-    func display (groupIndex:Int, contactIndex:Int) {
-        currentProfile = allProfiles[groupIndex].contacts[contactIndex]
-        nameLabel.text = currentProfile.name
-        zipcodeTextView.text = currentProfile.address.zipcode
-        addressTextView.text = currentProfile.address.full
+    
+    func displayByIndexPath (contactIndexPath:NSIndexPath) {
+        if let currentProfile = loadContactByIndexPath(contactIndexPath) {
+            nameLabel.text = currentProfile.name
+            zipcodeTextView.text = currentProfile.address.zipcode
+            addressTextView.text = currentProfile.address.full
+        }
     }
     
     func showMoreInfo (sender:AnyObject?) {

@@ -17,8 +17,8 @@ import UIKit
 class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     // 更新列表索引
-    var updateIndex = [[Int]]()
-    var tmpUpdateArray = [Profile]()
+    var updateIndex = [NSIndexPath]()
+    //var tmpUpdateArray = [Profile]()
     
     // 界面控件
     var messageLabel:UILabel = UILabel()
@@ -29,7 +29,7 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tmpUpdateArray = buildUpdateProfileArray(updateIndex)
+        //tmpUpdateArray = buildUpdateProfileArray(updateIndex)
         
         self.view.backgroundColor = UIColor.whiteColor()
         let viewPadding:CGFloat = 16
@@ -82,7 +82,7 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func updateContactsCount() -> String {
-        return "Update list （\(tmpUpdateArray.count)）"
+        return "Update list （\(updateIndex.count)）"
     }
     
     /*
@@ -106,11 +106,11 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
     更新列表表格设置部分
     */
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return tmpUpdateArray.count//testData.count
+        return updateIndex.count//testData.count
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "updateListCell")
-        cell.textLabel.text = tmpUpdateArray[indexPath.row].name
+        cell.textLabel.text = (loadContactByIndexPath(updateIndex[indexPath.row]) ?? ProfileSaved()).name//loadContactsByGroup(contactsGroups[updateIndex[indexPath.row].section])?[updateIndex[indexPath.row].row].name
         return cell
     }
     /*
@@ -126,7 +126,7 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         return "Delete"
     }
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath){
-        tmpUpdateArray.removeAtIndex(indexPath.row)
+        updateIndex.removeAtIndex(indexPath.row)
         updateListTable.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Top)
         
         updateListLabel.text = updateContactsCount()

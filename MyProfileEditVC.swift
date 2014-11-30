@@ -43,10 +43,10 @@ class MyProfileEditViewController: UIViewController {
     */
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier? == "myProfileEditDone" {
-            myAddress = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)
-            myProfile.address = myAddress
+            //myAddress = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)
+            //myProfile.address = myAddress
             if nameTextField.text != "" && nameTextField.text != "Strongly struggest REAL name" {
-                myProfile.name = nameTextField.text
+                //myProfile.name = nameTextField.text
             }
         }
     }

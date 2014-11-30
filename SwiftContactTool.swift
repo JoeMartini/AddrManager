@@ -41,39 +41,17 @@ func getSysContacts() -> [Profile] {
                     // 地址
                     case kABPersonAddressProperty :
                         var addrNSDict:NSMutableDictionary = value.takeRetainedValue() as NSMutableDictionary
-                        var tmpAddrKey:String = i>0 ? "Address\(i)" : "Address"
-                        valueDictionary[tmpAddrKey] = Address(province: (addrNSDict.valueForKey(kABPersonAddressStateKey) as? String), city: (addrNSDict.valueForKey(kABPersonAddressCityKey) as? String), district: nil, street: (addrNSDict.valueForKey(kABPersonAddressStreetKey) as? String), identifier:tmpAddrKey)
-                        /*
-                        valueDictionary[label+"_Country"] = addrNSDict.valueForKey(kABPersonAddressCountryKey) as? String ?? ""
-                        valueDictionary[label+"_State"] = addrNSDict.valueForKey(kABPersonAddressStateKey) as? String ?? ""
-                        valueDictionary[label+"_City"] = addrNSDict.valueForKey(kABPersonAddressCityKey) as? String ?? ""
-                        valueDictionary[label+"_Street"] = addrNSDict.valueForKey(kABPersonAddressStreetKey) as? String ?? ""
-                        valueDictionary[label+"_Contrycode"] = addrNSDict.valueForKey(kABPersonAddressCountryCodeKey) as? String ?? ""
-
-                        // 地址整理（国家和国家代码通过“三目运算”取不为空者，若均为空未处理）
-                        var tmpAddrKey:String = i>0 ? "Address\(i)" : "Address"    // 解决后一个地址覆盖前一个地址的问题 —— 第一个地址仍然标记为Address，其他的标记为Address1等
-                        valueDictionary[tmpAddrKey] = (valueDictionary[label+"_Country"]! == "" ? valueDictionary[label+"_Contrycode"]! : valueDictionary[label+"_Country"]!) + ", " + valueDictionary[label+"_State"]! + ", " + valueDictionary[label+"_City"]! + ", " + valueDictionary[label+"_Street"]!
-                        */
-                    // SNS
-                    case kABPersonSocialProfileProperty :
-                        var snsNSDict:NSMutableDictionary = value.takeRetainedValue() as NSMutableDictionary
-                        valueDictionary[label+"_Username"] = snsNSDict.valueForKey(kABPersonSocialProfileUsernameKey) as? String ?? ""
-                        valueDictionary[label+"_URL"] = snsNSDict.valueForKey(kABPersonSocialProfileURLKey) as? String ?? ""
-                        valueDictionary[label+"_Serves"] = snsNSDict.valueForKey(kABPersonSocialProfileServiceKey) as? String ?? ""
-                    // IM
-                    case kABPersonInstantMessageProperty :
-                        var imNSDict:NSMutableDictionary = value.takeRetainedValue() as NSMutableDictionary
-                        valueDictionary[label+"_Serves"] = imNSDict.valueForKey(kABPersonInstantMessageServiceKey) as? String ?? ""
-                        valueDictionary[label+"_Username"] = imNSDict.valueForKey(kABPersonInstantMessageUsernameKey) as? String ?? ""
-                    // Date
-                    case kABPersonDateProperty :
-                        valueDictionary[label] = (value.takeRetainedValue() as? NSDate)?.description
+                        // 暂时忽略英文地址
+                        if languageDetectByFirstCharacter(addrNSDict.valueForKey(kABPersonAddressStreetKey) as? String ?? "") == language.Chinese {
+                            var tmpAddrKey:String = valueDictionary.isEmpty ? "Address" : "Address\(i)"
+                            valueDictionary[tmpAddrKey] = Address(province: (addrNSDict.valueForKey(kABPersonAddressStateKey) as? String), city: (addrNSDict.valueForKey(kABPersonAddressCityKey) as? String), district: nil, street: (addrNSDict.valueForKey(kABPersonAddressStreetKey) as? String), identifier:tmpAddrKey)
+                        }
                     default :
                         valueDictionary[label] = value.takeRetainedValue() as? String ?? ""
                     }
                 }
                 
-                return valueDictionary
+                return valueDictionary.isEmpty ? nil : valueDictionary
             }else{
                 return nil
             }
@@ -81,73 +59,57 @@ func getSysContacts() -> [Profile] {
         
         for contact in sysContacts {
             var currentContact:Profile = Profile()
-            currentContact.resource = contactResource.systemAddressBook
-            /*
-            部分单值属性
-            */
-            // 名、名字拼音
-            currentContact.firstName = ABRecordCopyValue(contact, kABPersonFirstNameProperty)?.takeRetainedValue() as String?
-            //currentContact.firstNamePhonetic = ABRecordCopyValue(contact, kABPersonFirstNamePhoneticProperty)?.takeRetainedValue() as String?
-            // 姓、姓氏拼音
-            currentContact.lastName = ABRecordCopyValue(contact, kABPersonLastNameProperty)?.takeRetainedValue() as String?
-            //currentContact.lastNamePhonetic = ABRecordCopyValue(contact, kABPersonLastNamePhoneticProperty)?.takeRetainedValue() as String?
-            // 昵称
-            //currentContact.nikeName = ABRecordCopyValue(contact, kABPersonNicknameProperty)?.takeRetainedValue() as String?
+            var effectiveContact:Bool = true
+            currentContact.source = "systemAddressBook"
+            currentContact.firstName = ABRecordCopyValue(contact, kABPersonFirstNameProperty)?.takeRetainedValue() as? String
+            currentContact.firstNamePhonetic = ABRecordCopyValue(contact, kABPersonFirstNamePhoneticProperty)?.takeRetainedValue() as? String
+            currentContact.lastName = ABRecordCopyValue(contact, kABPersonLastNameProperty)?.takeRetainedValue() as? String
+            currentContact.lastNamePhonetic = ABRecordCopyValue(contact, kABPersonLastNamePhoneticProperty)?.takeRetainedValue() as? String
             
             // 姓名整理
             switch languageDetectByFirstCharacter((currentContact.firstName? ?? "") + (currentContact.lastName? ?? "")) {
             case .Chinese :
                 // 中文
-                currentContact.name = (currentContact.lastName? ?? "") + (currentContact.firstName != nil ? " " + currentContact.firstName! : "")
+                currentContact.name = (currentContact.lastName ?? "") + (currentContact.firstName ?? "")
+                /*
+                if currentContact.firstNamePhonetic != nil || currentContact.lastNamePhonetic != nil {
+                    currentContact.namePhonetic = (currentContact.lastNamePhonetic ?? "") + (currentContact.firstNamePhonetic != nil ? " " + currentContact.firstNamePhonetic! : "")
+                }else{
+                    currentContact.namePhonetic = getPinyin(currentContact.lastName ?? "" + (currentContact.firstName == nil ? "" : " " + getPinyin(currentContact.firstName!)))
+                }*/
             default :
                 // 英文
-                currentContact.name = (currentContact.firstName? ?? "") + (currentContact.lastName != nil ? " " + currentContact.lastName! : "")
+                currentContact.name = (currentContact.firstName ?? "") + (currentContact.lastName != nil ? " " + currentContact.lastName! : "")
             }
-
-
+            currentContact.namePhonetic = getPinyin(currentContact.name)
             
-            // 公司（组织）
-            //currentContact.organization = ABRecordCopyValue(contact, kABPersonOrganizationProperty)?.takeRetainedValue() as String?
-            // 职位
-            //currentContact.jobTitle = ABRecordCopyValue(contact, kABPersonJobTitleProperty)?.takeRetainedValue() as String?
-            // 部门
-            //currentContact.department = ABRecordCopyValue(contact, kABPersonDepartmentProperty)?.takeRetainedValue() as String?
-            // 备注
-            //currentContact.note = ABRecordCopyValue(contact, kABPersonNoteProperty)?.takeRetainedValue() as String?
-            // 生日（类型转换有问题，不可用）
-            //currentContact.brithday = ((ABRecordCopyValue(contact, kABPersonBirthdayProperty)?.takeRetainedValue()) as NSDate).description
+            if currentContact.name == "" {
+                effectiveContact = false
+            }
             
-            /*
-            部分多值属性
-            */
-            // 电话
-            //currentContact.phones = analyzeContactProperty(contact, kABPersonPhoneProperty,"Phone") as? [String:String]
-            // E-mail
-            //currentContact.emails = analyzeContactProperty(contact, kABPersonEmailProperty, "Email") as? [String:String]
             // 地址
-            for (key, value) in (analyzeContactProperty(contact, kABPersonAddressProperty, "Address") as? [String:Address]) ?? ["":Address()] {
-                currentContact.addresses?.append(value)
-                if key == "Address" {
-                    currentContact.address = value
+            if let addresses = analyzeContactProperty(contact, kABPersonAddressProperty, "Address") as? [String:Address] {
+                currentContact.address = addresses["Address"]!
+                if addresses.count > 1 {
+                    for (key, value) in addresses {
+                        //if key != "Address" {   }       若默认地址不应出现于所有地址数组中，则放入此判断中
+                        if var currentContactAddresses = currentContact.addresses {
+                            currentContactAddresses.append(value)
+                        }else{
+                            currentContact.addresses = [value]
+                        }
+                    }
                 }
+            }else{
+                effectiveContact = false
             }
-            /*
-            // 纪念日
-            for (key, value) in analyzeContactProperty(contact, kABPersonDateProperty, "Date") as? [String:Date] {
-            currentContact[key] = value
+            
+            if effectiveContact {
+                allContacts.append(currentContact)
             }
-            // URL
-            for (key, value) in analyzeContactProperty(contact, kABPersonURLProperty, "URL") as? [String:NSURL] {
-            currentContact[key] = value
-            }
-            // SNS
-            for (key, value) in analyzeContactProperty(contact, kABPersonSocialProfileProperty, "_SNS") as? [String:String] {
-            currentContact[key] = value
-            }
-            */
-            allContacts.append(currentContact)
         }
         
+        println(allContacts.count)
         return allContacts
     }
     
@@ -195,3 +157,82 @@ func languageDetectByFirstCharacter (str:String?) -> language {
     }
     return language.ND
 }
+
+func getPinyin (cn:String, withPhonetic:Bool = true) -> String {
+    var pinyin = NSMutableString(string: cn) as CFMutableStringRef
+    if withPhonetic {
+        CFStringTransform(pinyin, nil, kCFStringTransformMandarinLatin, Boolean(0))
+        return pinyin as String
+    }else{
+        CFStringTransform(pinyin, nil, kCFStringTransformStripCombiningMarks, Boolean(0))
+        return pinyin as String
+    }
+}
+// 名、名字拼音
+//currentContact.firstNamePhonetic = ABRecordCopyValue(contact, kABPersonFirstNamePhoneticProperty)?.takeRetainedValue() as String?
+// 姓、姓氏拼音
+//currentContact.lastNamePhonetic = ABRecordCopyValue(contact, kABPersonLastNamePhoneticProperty)?.takeRetainedValue() as String?
+// 昵称
+//currentContact.nikeName = ABRecordCopyValue(contact, kABPersonNicknameProperty)?.takeRetainedValue() as String?
+// 公司（组织）
+//currentContact.organization = ABRecordCopyValue(contact, kABPersonOrganizationProperty)?.takeRetainedValue() as String?
+// 职位
+//currentContact.jobTitle = ABRecordCopyValue(contact, kABPersonJobTitleProperty)?.takeRetainedValue() as String?
+// 部门
+//currentContact.department = ABRecordCopyValue(contact, kABPersonDepartmentProperty)?.takeRetainedValue() as String?
+// 备注
+//currentContact.note = ABRecordCopyValue(contact, kABPersonNoteProperty)?.takeRetainedValue() as String?
+// 生日（类型转换有问题，不可用）
+//currentContact.brithday = ((ABRecordCopyValue(contact, kABPersonBirthdayProperty)?.takeRetainedValue()) as NSDate).description
+
+/*
+部分多值属性
+*/
+// 电话
+//currentContact.phones = analyzeContactProperty(contact, kABPersonPhoneProperty,"Phone") as? [String:String]
+// E-mail
+//currentContact.emails = analyzeContactProperty(contact, kABPersonEmailProperty, "Email") as? [String:String]
+
+/*
+// 纪念日
+for (key, value) in analyzeContactProperty(contact, kABPersonDateProperty, "Date") as? [String:Date] {
+currentContact[key] = value
+}
+// URL
+for (key, value) in analyzeContactProperty(contact, kABPersonURLProperty, "URL") as? [String:NSURL] {
+currentContact[key] = value
+}
+// SNS
+for (key, value) in analyzeContactProperty(contact, kABPersonSocialProfileProperty, "_SNS") as? [String:String] {
+currentContact[key] = value
+}
+*/
+
+/*
+// SNS
+case kABPersonSocialProfileProperty :
+var snsNSDict:NSMutableDictionary = value.takeRetainedValue() as NSMutableDictionary
+valueDictionary[label+"_Username"] = snsNSDict.valueForKey(kABPersonSocialProfileUsernameKey) as? String ?? ""
+valueDictionary[label+"_URL"] = snsNSDict.valueForKey(kABPersonSocialProfileURLKey) as? String ?? ""
+valueDictionary[label+"_Serves"] = snsNSDict.valueForKey(kABPersonSocialProfileServiceKey) as? String ?? ""
+// IM
+case kABPersonInstantMessageProperty :
+var imNSDict:NSMutableDictionary = value.takeRetainedValue() as NSMutableDictionary
+valueDictionary[label+"_Serves"] = imNSDict.valueForKey(kABPersonInstantMessageServiceKey) as? String ?? ""
+valueDictionary[label+"_Username"] = imNSDict.valueForKey(kABPersonInstantMessageUsernameKey) as? String ?? ""
+// Date
+case kABPersonDateProperty :
+valueDictionary[label] = (value.takeRetainedValue() as? NSDate)?.description
+*/
+
+/*
+valueDictionary[label+"_Country"] = addrNSDict.valueForKey(kABPersonAddressCountryKey) as? String ?? ""
+valueDictionary[label+"_State"] = addrNSDict.valueForKey(kABPersonAddressStateKey) as? String ?? ""
+valueDictionary[label+"_City"] = addrNSDict.valueForKey(kABPersonAddressCityKey) as? String ?? ""
+valueDictionary[label+"_Street"] = addrNSDict.valueForKey(kABPersonAddressStreetKey) as? String ?? ""
+valueDictionary[label+"_Contrycode"] = addrNSDict.valueForKey(kABPersonAddressCountryCodeKey) as? String ?? ""
+
+// 地址整理（国家和国家代码通过“三目运算”取不为空者，若均为空未处理）
+var tmpAddrKey:String = i>0 ? "Address\(i)" : "Address"    // 解决后一个地址覆盖前一个地址的问题 —— 第一个地址仍然标记为Address，其他的标记为Address1等
+valueDictionary[tmpAddrKey] = (valueDictionary[label+"_Country"]! == "" ? valueDictionary[label+"_Contrycode"]! : valueDictionary[label+"_Country"]!) + ", " + valueDictionary[label+"_State"]! + ", " + valueDictionary[label+"_City"]! + ", " + valueDictionary[label+"_Street"]!
+*/

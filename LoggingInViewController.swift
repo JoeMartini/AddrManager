@@ -15,19 +15,14 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
     
     @IBOutlet weak var userIDInputTextField: UITextField!
     @IBOutlet weak var passwordInputTextField: UITextField!
-    @IBOutlet weak var contactImprotingIndicator: UIActivityIndicatorView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         autoTFDelegate([userIDInputTextField, passwordInputTextField], self)
-        
-        println("\(today.year)\(today.month)\(today.day)")
     }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     @IBAction func userIDInputFinished(sender: AnyObject) {
@@ -51,17 +46,36 @@ class LoggingInViewController: UIViewController, CLLocationManagerDelegate {
     
     // 暂时用按钮触发通讯录导入
     @IBAction func importContactButton(sender: AnyObject) {
-        //contactImprotingIndicator.hidden = false
-        contactImprotingIndicator.startAnimating()
-        println(contactImprotingIndicator.isAnimating())
-        var sysContacts:Array = getSysContacts()
-        for sysContact in sysContacts {
-            // 只导入系统通讯录中有地址的联系人
-            if sysContact.address.full != "" {
-                allProfiles[1].addContactInGroup(sysContact)//defaultContactGroup.addContactInGroup(sysContact)
+        
+        let inProgressAlert = UIAlertController(title: "请耐心等候", message: "若联系人较多，导入时间会较长", preferredStyle: UIAlertControllerStyle.Alert)
+        
+        var chrysanthemum:UIActivityIndicatorView = UIActivityIndicatorView(activityIndicatorStyle: UIActivityIndicatorViewStyle.WhiteLarge)
+        chrysanthemum.frame = CGRect(origin: CGPoint(x: inProgressAlert.view.bounds.origin.x, y: inProgressAlert.view.bounds.origin.y + 88.0), size: inProgressAlert.view.bounds.size)
+        chrysanthemum.autoresizingMask = UIViewAutoresizing.FlexibleWidth | UIViewAutoresizing.FlexibleHeight
+        //chrysanthemum.color = UIColor.blackColor()
+        chrysanthemum.startAnimating()
+        
+        inProgressAlert.view.addSubview(chrysanthemum)
+        
+        self.presentViewController(inProgressAlert, animated: true, completion: {
+            var sysContacts:Array = getSysContacts()
+            for sysContact in sysContacts {
+                // 只导入系统通讯录中有地址的联系人
+                if sysContact.address.full != "" && sysContact.name != "" {
+                    let duplicatePredicate = NSPredicate(format: "(name = %@) AND (address.full = %@)", sysContact.name, sysContact.address.full)!
+                    if (loadContactsByPredicateWithSort(duplicatePredicate) ?? []).isEmpty {
+                        saveContactsInGroupIntoCoreData(sysContact)
+                    }else{
+                        println("Duplicated")
+                    }
+                }
             }
-        }
-        contactImprotingIndicator.stopAnimating()
+        })
+        
+        inProgressAlert.dismissViewControllerAnimated(true, completion: {
+            chrysanthemum.stopAnimating()
+            println("import finished")
+        })
     }
     // 定位成功
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {

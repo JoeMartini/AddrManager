@@ -19,7 +19,7 @@ class MyAuthorizationTableViewController: UITableViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
-    
+    /*
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return myAddressAuthorizationList.count
     }
@@ -33,4 +33,5 @@ class MyAuthorizationTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         println("Change this authorization")
     }
+    */
 }

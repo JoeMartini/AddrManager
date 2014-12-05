@@ -12,25 +12,23 @@ class ContactAddViewController: UIViewController, UITextFieldDelegate, UIPickerV
     
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var addrPicker: UIPickerView!
-    @IBOutlet weak var addrdetailTextField: UITextField!
     @IBOutlet weak var typeinView: UIView!
     @IBOutlet weak var provinceTextField: UITextField!
     @IBOutlet weak var cityTextField: UITextField!
     @IBOutlet weak var districtTextField: UITextField!
     @IBOutlet weak var zipcodeTextView: UITextView!
+    @IBOutlet weak var addrStreetTextField: UITextField!
+    @IBOutlet weak var addrDetailTextField: UITextField!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // 选择框的委托设置
-        //let ADChinaPickerVC:ADPickerViewController = ADPickerViewController()
-        //self.view.addSubview(ADChinaPickerVC.view)
-        //self.addChildViewController(ADChinaPickerVC)
-        addrPicker.dataSource = self//ADChinaPickerVC
-        addrPicker.delegate = self//ADChinaPickerVC
+        addrPicker.dataSource = self
+        addrPicker.delegate = self
         
         // 输入框委托设置
-        autoTFDelegate([nameTextField,addrdetailTextField,provinceTextField,cityTextField,districtTextField], self)
+        autoTFDelegate([nameTextField,addrStreetTextField,addrDetailTextField,provinceTextField,cityTextField,districtTextField], self)
         
         switch self.navigationController?.viewControllers.count ?? 0 {
         case 1 :
@@ -38,7 +36,7 @@ class ContactAddViewController: UIViewController, UITextFieldDelegate, UIPickerV
         default :
             self.navigationItem.setLeftBarButtonItem(nil, animated: false)
             self.navigationItem.setLeftBarButtonItem(nil, animated: false)
-            self.navigationItem.setRightBarButtonItem(UIBarButtonItem(title: "Done", style: UIBarButtonItemStyle.Done, target: self, action: "editDone:"), animated: false)
+            self.navigationItem.setRightBarButtonItem(UIBarButtonItem(title: "完成", style: UIBarButtonItemStyle.Done, target: self, action: "editDone:"), animated: false)
             if let user = loadUserInfo().profile {
                 nameTextField.text = user.name ?? ""
                 if let provinceIndex = user.address.province.index as? Int {
@@ -53,9 +51,12 @@ class ContactAddViewController: UIViewController, UITextFieldDelegate, UIPickerV
                 if let districtIndex = user.address.district.index as? Int {
                     addrPicker.selectRow(districtIndex, inComponent: 2, animated: true)
                 }
-                addrdetailTextField.text = user.address.street ?? ""
+                addrStreetTextField.text = user.address.street ?? ""
                 zipcodeTextView.text = user.address.zipcode ?? ""
             }
+            nameTextField.clearsOnBeginEditing = false
+            addrStreetTextField.clearsOnBeginEditing = false
+            addrDetailTextField.clearsOnBeginEditing = false
         }
     }
     
@@ -74,7 +75,7 @@ class ContactAddViewController: UIViewController, UITextFieldDelegate, UIPickerV
             信息规范性检测：姓名不为空；详细地址不为空
             检测通过则继续，不通过需要处理机制（弹出对话框填写or返回原界面）
             */
-            if addrdetailTextField.text == "" {
+            if addrStreetTextField.text == "" {
                 println("Error,no address detail")
             }
             saveContactsInGroupIntoCoreData(buildUpProfile())
@@ -92,9 +93,9 @@ class ContactAddViewController: UIViewController, UITextFieldDelegate, UIPickerV
     }
     
     func buildUpProfile() -> Profile {
-        var addressToSave:Address = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)
+        var addressToSave:Address = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: (addrStreetTextField.text + addrDetailTextField.text))
         addressToSave.zipcode = addressToSave.zipcode.toInt() < zipcodeTextView.text.toInt() ? zipcodeTextView.text : addressToSave.zipcode
-        return Profile(name: nameTextField.text, address: addressToSave)
+        return Profile(name: nameTextField.text, address: addressToSave, source:"Manually Input")
     }
     
     @IBAction func typeInAddress(sender: AnyObject) {
@@ -102,11 +103,8 @@ class ContactAddViewController: UIViewController, UITextFieldDelegate, UIPickerV
         typeinView.hidden = !typeinView.hidden
     }
     
-    @IBAction func nameEditEnd(sender: AnyObject) {
-    }
-    
     @IBAction func addrdetailEditEnd(sender: AnyObject) {
-        var tmpAddr:Address = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrdetailTextField.text)
+        var tmpAddr:Address = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrStreetTextField.text)
         zipcodeTextView.text = tmpAddr.zipcode.toInt() < zipcodeTextView.text.toInt() ? zipcodeTextView.text : tmpAddr.zipcode
     }
     
@@ -161,12 +159,20 @@ class ContactAddViewController: UIViewController, UITextFieldDelegate, UIPickerV
         
         var tmpAddr:Address = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street:nil)
         zipcodeTextView.text = tmpAddr.zipcode
-        //zipcodeTextView.text = loadDistrictByAllIndexs(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2))?.zipcode
     }
     
-    // 点击下方TextField时，标记当前TextField
-    @IBAction func addrdetailTextFieldTapped(sender: AnyObject) {
-        //currentTextField = addrdetailTextField
+    @IBAction func streetEditEnd(sender: AnyObject) {
+        if let streetTF = sender as? UITextField {
+            var tmpAddr:Address = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street:streetTF.text)
+            zipcodeTextView.text = tmpAddr.zipcode.toInt() < zipcodeTextView.text.toInt() ? zipcodeTextView.text : tmpAddr.zipcode
+        }
+    }
+    
+    @IBAction func detailEditEnd(sender: AnyObject) {
+        if let detailTF = sender as? UITextField {
+            var tmpAddr:Address = Address(provinceIndex: addrPicker.selectedRowInComponent(0), cityIndex: addrPicker.selectedRowInComponent(1), districtIndex: addrPicker.selectedRowInComponent(2), street: addrStreetTextField.text +  detailTF.text)
+            zipcodeTextView.text = tmpAddr.zipcode.toInt() < zipcodeTextView.text.toInt() ? zipcodeTextView.text : tmpAddr.zipcode
+        }
     }
     
     // 点击背景处令输入框失去焦点，即可隐藏键盘
@@ -187,6 +193,5 @@ class ContactAddViewController: UIViewController, UITextFieldDelegate, UIPickerV
                 }
             }
         }
-
     }
 }

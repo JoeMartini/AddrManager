@@ -37,7 +37,7 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         let generlWidth = viewWidth - viewPadding * 2
         
         // 导航栏
-        self.navigationItem.title = "Update"
+        self.navigationItem.title = "更新"
         
         var navBarLeftButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: "updateCancel:")
         self.navigationItem.setLeftBarButtonItem(navBarLeftButton, animated: true)
@@ -110,7 +110,7 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
     }
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var cell:UITableViewCell = UITableViewCell(style: UITableViewCellStyle.Default, reuseIdentifier: "updateListCell")
-        cell.textLabel.text = (loadContactByIndexPath(updateIndex[indexPath.row]) ?? ProfileSaved()).name//loadContactsByGroup(contactsGroups[updateIndex[indexPath.row].section])?[updateIndex[indexPath.row].row].name
+        cell.textLabel?.text = (loadContactByIndexPath(updateIndex[indexPath.row]) ?? ProfileSaved()).name//loadContactsByGroup(contactsGroups[updateIndex[indexPath.row].section])?[updateIndex[indexPath.row].row].name
         return cell
     }
     /*
@@ -123,7 +123,7 @@ class ContactUpdateViewController: UIViewController, UITableViewDataSource, UITa
         return UITableViewCellEditingStyle.Delete
     }
     func tableView(tableView: UITableView, titleForDeleteConfirmationButtonForRowAtIndexPath indexPath: NSIndexPath) -> String! {
-        return "Delete"
+        return "删除"
     }
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath){
         updateIndex.removeAtIndex(indexPath.row)

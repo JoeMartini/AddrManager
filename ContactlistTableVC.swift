@@ -101,7 +101,7 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
         switch updateButton.tag {
         case 111 :      // 全选
             updateButton.title = "完成"
-            for indexPath in contactsList.values {//getAllIndexPaths() {
+            for indexPath in contactsList.values {
                 self.tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: UITableViewScrollPosition.None)
             }
             updateButton.tag = 222
@@ -384,59 +384,3 @@ class ContactlistTableViewController: UITableViewController, UIActionSheetDelega
 
 
 }
-/*
-let updateActionSheet:UIActionSheet = UIActionSheet(title: nil, delegate: self, cancelButtonTitle: "Cancel", destructiveButtonTitle: "Update All", otherButtonTitles: "Choose to Update")
-updateActionSheet.showInView(self.view)
-*/
-/*
-func alertView(alertView: UIAlertView, clickedButtonAtIndex buttonIndex: Int) {
-if buttonIndex == 0 {
-updateCancel(nil)
-}
-}
-*/
-/*
-ActionSheet按钮响应函数
-ButtonIndex:
-0. 默认（缺省）按钮
-1. 取消按钮
-2. OtherButton中第1个，此后依此类推
-
-func actionSheet(actionSheet: UIActionSheet, clickedButtonAtIndex buttonIndex: Int) {
-switch buttonIndex {
-case 0 :
-updateWillStart(nil)        // 此处应首先获取所有需要更新用户之索引（已过期），暂时以所有用户代替
-case 2 :
-// 设置导航右侧按钮
-updateButton.tag = 111
-updateButton.title = "Select All"
-
-// 替换导航左侧按钮（先保存）
-reuseAddBarButton = self.navigationItem.leftBarButtonItem!
-
-var cancelNavButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Cancel, target: self, action: "updateCancel:")
-self.navigationItem.setLeftBarButtonItem(cancelNavButton, animated: true)
-
-// 列表进入多选状态
-self.tableView.allowsMultipleSelection = true
-self.tableView.allowsMultipleSelectionDuringEditing = true
-self.tableView.setEditing(true, animated: true)
-case 1 : // cancel button
-break
-default :
-println(buttonIndex)
-}
-}
-*/
-
-/* iOS7 系统自带滑动删除（仅删除按钮）
-override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-return true
-}
-override func tableView(tableView: UITableView, editingStyleForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCellEditingStyle {
-return UITableViewCellEditingStyle.Delete
-}
-override func tableView(tableView: UITableView, titleForDeleteConfirmationButtonForRowAtIndexPath indexPath: NSIndexPath) -> String! {
-return "Delete"
-}
-*/
